@@ -1,0 +1,80 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  min-width: 320px;
+  margin: 0;
+  background: #f5f5f5;
+}
+
+header {
+  box-shadow: 0px 3.3862948417663574px 5.643825054168701px 0px #b0bec552;
+  box-shadow: 0px 9.030119895935059px 27.09035873413086px 0px #b0bec552;
+}
+
+.highlighted {
+  background-color: #c0c0c0;
+  font-weight: bold;
+  border-radius: 10%;
+}
+
+.button-addClient svg path {
+  fill: #9873ff;
+}
+.button-addClient:hover svg path {
+  fill: white;
+}
+.button-addClient:disabled svg path {
+  fill: #c8c5d1;
+}
+/* .button-addContact svg path {
+  fill: #9873ff;
+}
+.button-addContact:hover svg path {
+  fill: white;
+} */
+.button-deleteContact svg g path {
+  fill: #b0b0b0;
+}
+.button-deleteContact:hover svg g path {
+  fill: #f06a4d;
+}
+
+.select-contactType::after {
+  content: "sss";
+  position: absolute;
+  display: block;
+  right: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  background-color: #9873ff;
+}
+
+.shake {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
