@@ -103,32 +103,21 @@ const Client: React.FC<{
   };
 
   return (
-    <div
-      className="
-        flex
-        items-center 
-        border-b 
-        border-gray-200 
-        py-2 
-        h-[60px]
-        bg-white
-        text-sm
-      "
-    >
-      <div className="w-[100px] min-w-[80px] pl-5 pr-2 text-txt-grey text-xs break-all">
+    <div className="grid-table-row border-b border-gray-200 py-2 h-[60px] bg-white text-sm">
+      <div className="grid-table-cell-id pl-5 pr-2 text-txt-grey text-xs break-all">
         {client.id}
       </div>
-      <div className="w-[370px] min-w-[220px] text-sm">
+      <div className="grid-table-cell-name">
         {highlightMatches(client.name)} {highlightMatches(client.lastName)}{" "}
         {highlightMatches(client.surname)}
       </div>
-      <div className="w-[175px] min-w-[100px] text-sm pr-2">
+      <div className="grid-table-cell-created pr-2">
         {formattedCreatedAt.date} <span className="text-txt-grey">{formattedCreatedAt.time}</span>
       </div>
-      <div className="w-[175px] min-w-[100px] text-sm pr-2">
+      <div className="grid-table-cell-updated pr-2">
         {formattedUpdatedAt.date} <span className="text-txt-grey">{formattedUpdatedAt.time}</span>
       </div>
-      <div ref={tooltipRef} className="w-[160px] min-w-[130px] flex flex-wrap flex-between">
+      <div ref={tooltipRef} className="grid-table-cell-contacts flex flex-wrap">
         {visibleContacts.map((contact, index) => (
           <div
             key={index}
@@ -184,7 +173,7 @@ const Client: React.FC<{
         )}
       </div>
 
-      <div className="w-[210px] min-w-[110px] flex flex-col justify-between  lg:flex-row lg:min-w-[210px] lg:pr-5">
+      <div className="grid-table-cell-actions flex flex-col lg:flex-row justify-between lg:pr-5">
         {isUpdating ? (
           <button className="flex items-center text-firm" onClick={openEditModal}>
             <SpinnerIcon color="#9873ff" />

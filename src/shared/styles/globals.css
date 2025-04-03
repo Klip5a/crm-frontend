@@ -78,3 +78,61 @@ header {
     transform: translateX(0);
   }
 }
+
+.grid-table-container {
+  width: 100%;
+  min-width: 768px;
+  overflow-x: auto;
+}
+
+.grid-table-header,
+.grid-table-row {
+  display: grid;
+  grid-template-columns: 
+    minmax(80px, 100px) 
+    minmax(220px, 370px) 
+    minmax(100px, 175px) 
+    minmax(100px, 175px) 
+    minmax(130px, 160px) 
+    minmax(110px, 210px);
+  grid-template-areas: 
+    "id name created updated contacts actions";
+  align-items: center;
+}
+
+.grid-table-cell-id {
+  grid-area: id;
+}
+
+.grid-table-cell-name {
+  grid-area: name;
+}
+
+.grid-table-cell-created {
+  grid-area: created;
+}
+
+.grid-table-cell-updated {
+  grid-area: updated;
+}
+
+.grid-table-cell-contacts {
+  grid-area: contacts;
+}
+
+.grid-table-cell-actions {
+  grid-area: actions;
+}
+
+@media (max-width: 992px) {
+  .grid-table-header,
+  .grid-table-row {
+    grid-template-columns: 
+      minmax(80px, 100px) 
+      minmax(180px, 300px) 
+      minmax(100px, 150px) 
+      minmax(100px, 150px) 
+      minmax(120px, 140px) 
+      minmax(110px, 160px);
+  }
+}

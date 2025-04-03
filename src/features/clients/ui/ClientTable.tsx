@@ -24,20 +24,22 @@ const ClientTable: React.FC<ClientTableProps> = ({
 }) => {
   return (
     <div className="overflow-x-auto max-xl:mx-5">
-      <ClientTableHeader onSort={onSort} sortField={sortField} sortOrder={sortOrder} />
-      <div>
-        {isLoading
-          ? Array(5)
-              .fill(0)
-              .map((_, index) => <ClientTableSkeleton key={index} />)
-          : clients.map((client) => (
-              <Client
-                key={client.id}
-                client={client}
-                filterText={searchQuery}
-                fetchClients={fetchClients}
-              />
-            ))}
+      <div className="grid-table-container">
+        <ClientTableHeader onSort={onSort} sortField={sortField} sortOrder={sortOrder} />
+        <div>
+          {isLoading
+            ? Array(5)
+                .fill(0)
+                .map((_, index) => <ClientTableSkeleton key={index} />)
+            : clients.map((client) => (
+                <Client
+                  key={client.id}
+                  client={client}
+                  filterText={searchQuery}
+                  fetchClients={fetchClients}
+                />
+              ))}
+        </div>
       </div>
     </div>
   );

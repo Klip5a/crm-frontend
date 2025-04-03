@@ -27,23 +27,23 @@ const ClientTableHeader: React.FC<ClientTableHeaderProps> = ({ onSort, sortField
   };
 
   return (
-    <div className="flex items-center text-xs text-grey mt-2.5 h-8">
+    <div className="grid-table-header mt-2.5 h-8 text-xs text-grey">
       <div
-        className="flex items-center w-[100px] min-w-[80px] cursor-pointer pl-5 text-firm"
+        className="grid-table-cell-id cursor-pointer pl-5 text-firm flex items-center"
         onClick={() => handleSort("id")}
       >
         ID
         {renderSortIcon("id")}
       </div>
       <div
-        className="flex items-center w-[370px] min-w-[220px] cursor-pointer"
+        className="grid-table-cell-name cursor-pointer flex items-center"
         onClick={() => handleSort("name")}
       >
         <p>Фамилия Имя Отчество&nbsp;{renderSortIcon("name")}</p>
         <span className="ml-1 text-firm text-[10px]">{sortOrder === "asc" ? "А-Я" : "Я-А"}</span>
       </div>
       <div
-        className="flex items-center w-[175px] min-w-[100px] cursor-pointer"
+        className="grid-table-cell-created cursor-pointer flex items-center"
         onClick={() => handleSort("createdAt")}
       >
         <p>
@@ -52,7 +52,7 @@ const ClientTableHeader: React.FC<ClientTableHeaderProps> = ({ onSort, sortField
         </p>
       </div>
       <div
-        className="flex items-center w-[175px] min-w-[100px] cursor-pointer"
+        className="grid-table-cell-updated cursor-pointer flex items-center"
         onClick={() => handleSort("updatedAt")}
       >
         <p>
@@ -60,8 +60,8 @@ const ClientTableHeader: React.FC<ClientTableHeaderProps> = ({ onSort, sortField
           <span className="whitespace-nowrap">изменения{renderSortIcon("updatedAt")}</span>
         </p>
       </div>
-      <div className="flex items-center w-[160px] min-w-[130px]">Контакты</div>
-      <div className="flex items-center w-[210px] min-w-[110px] lg:min-w-[210px]">Действия</div>
+      <div className="grid-table-cell-contacts flex items-center">Контакты</div>
+      <div className="grid-table-cell-actions flex items-center">Действия</div>
     </div>
   );
 };
