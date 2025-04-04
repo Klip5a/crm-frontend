@@ -21,7 +21,8 @@
     "react-compiler-runtime": "^19.0.0-beta-e1e972c-20250221",
     "react-dom": "^18.2.0",
     "react-input-mask": "^2.0.4",
-    "react-number-format": "^5.4.3"
+    "react-number-format": "^5.4.3",
+    "react-router": "^7.4.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
