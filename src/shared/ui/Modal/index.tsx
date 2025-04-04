@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import { ClientData } from "../../../entities/client";
 import { useModalForm } from "./hooks/useModalForm";
@@ -37,9 +37,30 @@ const Modal: React.FC<ModalProps> = (props) => {
     handleContactValueChange,
     handleDeleteContact,
   } = useModalForm(props);
-
   // Локальное состояние для подтверждения удаления в режиме редактирования
   const [confirmDelete, setConfirmDelete] = useState(false);
+  //
+  const [shouldRender, setShouldRender] = useState<boolean>(false);
+  const [animate, setAnimate] = useState(false);
+  const animationDuration = 500;
+
+  useLayoutEffect(() => {
+    if (props.isOpen) {
+      setShouldRender(true);
+      // Используем requestAnimationFrame для гарантии применения стилей до анимации
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setAnimate(true);
+        });
+      });
+    } else {
+      setAnimate(false);
+      const timer = setTimeout(() => setShouldRender(false), animationDuration);
+      return () => clearTimeout(timer);
+    }
+  }, [props.isOpen]);
+
+  if (!shouldRender) return null;
 
   // Если редактирование – при первом клике переходим в режим подтверждения
   const triggerConfirmDelete = () => {
@@ -61,15 +82,16 @@ const Modal: React.FC<ModalProps> = (props) => {
 
   return (
     <div
-      className={`fixed z-10 inset-0 overflow-hidden flex items-center justify-center transition-opacity duration-500 ${
-        props.isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      className={`fixed z-10 inset-0 overflow-hidden flex items-center justify-center transition-all duration-500 ${
+        animate ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
+      style={{ transitionDuration: `${animationDuration}ms` }}
     >
       <div className="fixed inset-0 transition-opacity" aria-hidden="true">
         <div className="absolute inset-0 bg-black opacity-60"></div>
       </div>
       <div
-        className="
+        className={`
           relative
           bg-white
           text-left
@@ -80,7 +102,8 @@ const Modal: React.FC<ModalProps> = (props) => {
           w-full
           pt-4
           max-h-[calc(100vh-100px)]
-        "
+          ${animate ? "scale-100" : "scale-95"}
+        `}
       >
         <ModalHeader
           isDelete={deletionMode}
