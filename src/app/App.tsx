@@ -1,21 +1,9 @@
-import { useState } from "react";
-
-import CrmPage from "../pages/crm";
-import Header from "../pages/crm/components/Header";
-import NotificationContainer from "../shared/ui/Notification";
+import AppRouter from "./providers/Router";
 
 function App() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  function handleSearch(query: string) {
-    setSearchQuery(query);
-  }
-
   return (
     <main className="font-opensans">
-      <Header onSearch={handleSearch} />
-      <CrmPage searchQuery={searchQuery} />
-      <NotificationContainer />
+      <AppRouter />
     </main>
   );
 }
