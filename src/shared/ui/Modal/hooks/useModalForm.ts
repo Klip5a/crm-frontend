@@ -6,6 +6,7 @@ import {
   deleteClient,
   updateClient,
 } from "../../../../entities/client";
+import { useNotification } from "../../../hooks/useNotification";
 import { ModalProps } from "..";
 
 // не уверен, что это правильно, экспортировать или нет
@@ -24,7 +25,9 @@ export interface ClientContactExtended extends ClientContact {
  *
  */
 export const useModalForm = (props: ModalProps) => {
-  const { isOpen, isEditing, isDelete, onClose, onSave, onUpdate, onDelete, clientData } = props;
+  const { isOpen, isEditing, onClose, onSave, onUpdate, onDelete, clientData } = props;
+
+  const { addNotification } = useNotification();
 
   // Локальные состояния формы
   const [name, setName] = useState<string>("");
@@ -156,19 +159,22 @@ export const useModalForm = (props: ModalProps) => {
       // Редактирование существующего клиента
       updateClient(clientData?.id, clientInfo)
         .then((updateClient) => {
-          console.log("Клиент обновлен успешно:", updateClient);
+          // console.log("Клиент обновлен успешно:", updateClient);
+          addNotification("success", `Клиент ${updateClient.name} обновлен успешно`, 5000);
           onUpdate?.(updateClient);
           onClose();
           resetFields();
         })
         .catch((error) => {
           console.error("Ошибка при обновлении клиента:", error);
+          addNotification("error", "Ошибка обновления клиента", 5000);
         });
     } else {
       // Создание нового клиента
       createClient(clientInfo)
         .then((createdClient) => {
           console.log("Клиент создан успешно:", createdClient);
+          addNotification("success", "Клиент создан успешно", 5000);
           onSave?.(createdClient);
           onClose();
           resetFields();
@@ -181,13 +187,9 @@ export const useModalForm = (props: ModalProps) => {
 
   const handleDelete = () => {
     if (onDelete && clientData) {
-      console.log(`handleDelete() isDelete: ${isDelete}`);
-      console.log(`handleDelete() isEditing: ${isEditing}`);
-      console.log(`handleDelete() clientData.id: ${clientData.id}`);
-      console.log(`handleDelete() clientData: ${JSON.stringify(clientData)}`);
       deleteClient(clientData.id)
         .then(() => {
-          console.log("handleDelete() onDelete():", onDelete());
+          addNotification("success", "Клиент удален успешно", 5000);
           onDelete();
           onClose();
           resetFields();
