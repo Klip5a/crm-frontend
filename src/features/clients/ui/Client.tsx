@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { ClientData } from "../../../entities/client/types";
 import cancelIcon from "../../../shared/assets/cancel.svg";
@@ -87,6 +88,11 @@ const Client: React.FC<{
     fetchClients();
   };
 
+  const navigate = useNavigate();
+  const handleClickClient = (clientId: number) => {
+    navigate(`/clients/${clientId}`);
+  };
+
   // Функция подсветки совпадений
   const highlightMatches = (name: string) => {
     if (!filterText) return name;
@@ -103,7 +109,10 @@ const Client: React.FC<{
   };
 
   return (
-    <div className="grid-table-row border-b border-gray-200 py-2 h-[60px] bg-white text-sm">
+    <div
+      className="grid-table-row border-b border-gray-200 py-2 h-[60px] bg-white text-sm"
+      onClick={() => handleClickClient(client.id)}
+    >
       <div className="grid-table-cell-id pl-5 pr-2 text-txt-grey text-xs break-all">
         {client.id}
       </div>
