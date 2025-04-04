@@ -19,7 +19,7 @@ const ClientTableHeader: React.FC<ClientTableHeaderProps> = ({ onSort, sortField
           src={arrowSort}
           alt={`Sort ${sortOrder === "asc" ? "ascending" : "descending"}`}
           className={`absolute top-[2px] transform ${
-            sortField === field && sortOrder === "desc" ? "rotate-180" : ""
+            sortField === field && sortOrder === "asc" ? "rotate-180" : ""
           }`}
         />
       </span>
