@@ -15,7 +15,34 @@ module.exports = {
   plugins: ["react-refresh", "simple-import-sort", "react-compiler"],
   rules: {
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-    "simple-import-sort/imports": "error",
+    "simple-import-sort/imports": [
+      "error",
+      {
+        groups: [
+          // Группа для side-effect импортов (например, import "./polyfill";)
+          ["^\\u0000"],
+          // Node.js встроенные модули
+          ["^node:"],
+          // Сторонние библиотеки
+          ["^@?\\w"],
+          // Импорты с заданными alias
+          [
+            "^@app/",
+            "^@entities/",
+            "^@features/",
+            "^@shared/",
+            "^@pages/",
+            "^@widgets/",
+            "^@processes/",
+          ],
+          // Другие абсолютные импорты (начинающиеся не с точки)
+          ["^[^.]"],
+          // Относительные импорты
+          ["^\\./"],
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+        ],
+      },
+    ],
     "simple-import-sort/exports": "error",
     "react-compiler/react-compiler": "error",
   },
