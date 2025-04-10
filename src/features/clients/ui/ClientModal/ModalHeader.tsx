@@ -1,16 +1,14 @@
-// import { memo } from "react";
-
-import { ClientData } from "../../../entities/client";
-import closeIcon from "../../assets/close.svg";
+import { Client } from "@entities/client";
+import closeIcon from "@shared/assets/close.svg";
 
 interface ModalHeaderProps {
   isDelete: boolean;
   isEditing: boolean;
-  clientData?: ClientData;
+  client?: Client;
   onClose: () => void;
 }
 
-const ModalHeader: React.FC<ModalHeaderProps> = ({ isDelete, isEditing, clientData, onClose }) => {
+const ModalHeader: React.FC<ModalHeaderProps> = ({ isDelete, isEditing, client, onClose }) => {
   return (
     <>
       {isDelete ? (
@@ -34,9 +32,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({ isDelete, isEditing, clientDa
               {isEditing ? (
                 <>
                   Изменить данные
-                  <span className="ml-2 text-xs text-txt-grey font-normal">
-                    ID: {clientData?.id}
-                  </span>
+                  <span className="ml-2 text-xs text-txt-grey font-normal">ID: {client?.id}</span>
                 </>
               ) : (
                 <>Новый клиент</>

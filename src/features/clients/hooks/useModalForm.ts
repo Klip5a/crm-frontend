@@ -1,13 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import {
-  ClientContact,
-  createClient,
-  deleteClient,
-  updateClient,
-} from "../../../../entities/client";
-import { useNotification } from "../../../hooks/useNotification";
-import { ModalProps } from "..";
+import { ClientContact, createClient, deleteClient, updateClient } from "@entities/client";
+import { useNotification } from "@shared/hooks/useNotification";
+
+import { ClientModalProps } from "../ui/ClientModal/";
 
 // не уверен, что это правильно, экспортировать или нет
 /**
@@ -24,8 +20,8 @@ export interface ClientContactExtended extends ClientContact {
  * @returns Объект с состоянием формы, функциями управления состоянием и обработчиками событий
  *
  */
-export const useModalForm = (props: ModalProps) => {
-  const { isOpen, isEditing, onClose, onSave, onUpdate, onDelete, clientData } = props;
+export const useModalForm = (props: ClientModalProps) => {
+  const { isOpen, isEditing, onClose, onSave, onUpdate, onDelete, client } = props;
 
   const { addNotification } = useNotification();
 
@@ -44,18 +40,18 @@ export const useModalForm = (props: ModalProps) => {
    * Если редактируем клиента и клиент существует, заполняем поля формы
    */
   useEffect(() => {
-    if (isOpen && isEditing && clientData) {
-      setLastName(clientData.lastName);
-      setName(clientData.name);
-      setSurname(clientData.surname);
+    if (isOpen && isEditing && client) {
+      setLastName(client.lastName);
+      setName(client.name);
+      setSurname(client.surname);
       setContacts(
-        clientData.contacts.map((contact) => ({
+        client.contacts.map((contact) => ({
           ...contact,
           isNew: false,
         }))
       );
     }
-  }, [isOpen, isEditing, clientData]);
+  }, [isOpen, isEditing, client]);
 
   /**
    * Добавление нового пустого контакта в список
@@ -142,22 +138,22 @@ export const useModalForm = (props: ModalProps) => {
   const clientInfo = useMemo(() => {
     const now = new Date().toISOString();
     return {
-      id: clientData?.id || 0,
+      id: client?.id || 0,
       name,
       lastName,
       surname,
-      createdAt: clientData?.createdAt || now,
+      createdAt: client?.createdAt || now,
       updatedAt: now,
       contacts: contacts.filter((contact) => contact.type !== "" || contact.value !== ""),
     };
-  }, [clientData, name, lastName, surname, contacts]);
+  }, [client, name, lastName, surname, contacts]);
 
   const handleSave = () => {
     if (!validateForm()) return;
 
     if (isEditing) {
       // Редактирование существующего клиента
-      updateClient(clientData?.id, clientInfo)
+      updateClient(client?.id, clientInfo)
         .then((updateClient) => {
           // console.log("Клиент обновлен успешно:", updateClient);
           addNotification("success", `Клиент ${updateClient.name} обновлен успешно`, 5000);
@@ -186,14 +182,14 @@ export const useModalForm = (props: ModalProps) => {
   };
 
   const handleDelete = () => {
-    if (onDelete && clientData) {
-      deleteClient(clientData.id)
+    if (onDelete && client) {
+      deleteClient(client.id)
         .then(() => {
           addNotification("success", "Клиент удален успешно", 5000);
           onDelete();
           onClose();
           resetFields();
-          console.log("Клиент удален:", clientData.id);
+          console.log("Клиент удален:", client.id);
         })
         .catch((error) => {
           console.error("Ошибка при удалении клиента:", error);
@@ -253,14 +249,6 @@ export const useModalForm = (props: ModalProps) => {
     });
   };
 
-  // const handleMouseEnter = () => {
-  //   setIsHovered(true);
-  // };
-
-  // const handleMouseLeave = () => {
-  //   setIsHovered(false);
-  // };
-
   return {
     name,
     lastName,
@@ -281,8 +269,6 @@ export const useModalForm = (props: ModalProps) => {
     handleContactTypeChange,
     handleContactValueChange,
     handleDeleteContact,
-    // handleMouseEnter,
-    // handleMouseLeave,
     clientInfo,
   };
 };

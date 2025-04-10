@@ -1,6 +1,4 @@
-import { memo } from "react";
-
-export const DeleteIcon = memo(() => (
+export const DeleteIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_121_1083)">
       <path
@@ -14,6 +12,4 @@ export const DeleteIcon = memo(() => (
       </clipPath>
     </defs>
   </svg>
-));
-
-DeleteIcon.displayName = "DeleteIcon";
+);

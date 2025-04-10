@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 
-import addContactIcon from "../../../assets/addContact.svg";
-import addContactHoverIcon from "../../../assets/addContactHover.svg";
+import addContactIcon from "@shared/assets/addContact.svg";
+import addContactHoverIcon from "@shared/assets/addContactHover.svg";
 
 interface AddContactButtonProps {
   onClick: () => void;

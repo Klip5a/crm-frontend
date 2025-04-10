@@ -1,15 +1,16 @@
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { ClientData, getClients } from "../../entities/client";
-import AddClientButton from "../../features/clients/ui/AddClientButton";
-import ClientTable from "../../features/clients/ui/ClientTable";
-import Modal from "../../shared/ui/Modal";
-import NotificationContainer from "../../shared/ui/Notification";
+import { Client, getClients } from "@entities/client";
+import AddClientButton from "@features/clients/ui/AddClientButton";
+import ClientModal from "@features/clients/ui/ClientModal";
+import ClientTable from "@features/clients/ui/ClientTable/ClientTable";
+import NotificationContainer from "@shared/ui/Notification";
+
 import Header from "./components/Header";
 
 const CrmPage: React.FC = () => {
-  const [clients, setClients] = useState<ClientData[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [sortField, setSortField] = useState<string | null>("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,7 +76,7 @@ const CrmPage: React.FC = () => {
         />
         <AddClientButton onClick={openModal} />
 
-        <Modal
+        <ClientModal
           isOpen={isModalOpen}
           isEditing={false}
           isDelete={false}

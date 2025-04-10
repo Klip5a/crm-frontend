@@ -4,7 +4,8 @@ import { useCallback } from "react";
 import AddContactButton from "./components/AddContactButton";
 import ContactForm from "./components/ContactForm";
 import FloatingLabelInput from "./components/FloatingLabelInput";
-import { ClientContactExtended } from "./hooks/useModalForm";
+
+import { ClientContactExtended } from "../../hooks/useModalForm";
 
 const ANIMATION_CONFIG = {
   duration: 0.3,

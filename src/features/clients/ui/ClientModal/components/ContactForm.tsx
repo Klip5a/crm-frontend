@@ -1,9 +1,11 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { ClientContact } from "../../../../entities/client/types";
-import { formatPhoneNumber } from "../lib/phoneFormatter";
+import { ClientContact } from "@entities/client";
+
 import CustomSelect from "./CustomSelect";
 import { DeleteIcon } from "./DeleteIcon";
+
+import { formatPhoneNumber } from "../lib/phoneFormatter";
 
 const CONTACT_TYPES = ["Телефон", "Доп. телефон", "Email", "VK", "Facebook", "Другое"] as const;
 const PHONE_TYPES = ["Телефон", "Доп. телефон"] as const;

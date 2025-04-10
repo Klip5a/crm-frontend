@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { ClientData, getClientById } from "../../entities/client";
+import { Client, getClientById } from "../../entities/client";
 
 function ClientPage() {
   const { id } = useParams<{ id: string }>();
-  const [client, setClient] = useState<ClientData | null>(null);
+  const [client, setClient] = useState<Client | null>(null);
 
   useEffect(() => {
     if (id) {

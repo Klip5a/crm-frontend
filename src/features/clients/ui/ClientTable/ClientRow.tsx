@@ -1,25 +1,25 @@
 import { lazy, Suspense, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { ClientData } from "../../../entities/client/types";
-import cancelIcon from "../../../shared/assets/cancel.svg";
-import contactIcon from "../../../shared/assets/contact.svg";
-import editIcon from "../../../shared/assets/edit.svg";
-import facebookIcon from "../../../shared/assets/fb.svg";
-import mailIcon from "../../../shared/assets/mail.svg";
-import phoneIcon from "../../../shared/assets/phone.svg";
-import vkIcon from "../../../shared/assets/vk.svg";
+import { Client } from "@entities/client/types";
+import cancelIcon from "@shared/assets/cancel.svg";
+import contactIcon from "@shared/assets/contact.svg";
+import editIcon from "@shared/assets/edit.svg";
+import facebookIcon from "@shared/assets/fb.svg";
+import mailIcon from "@shared/assets/mail.svg";
+import phoneIcon from "@shared/assets/phone.svg";
+import vkIcon from "@shared/assets/vk.svg";
 
 // Ленивый импорт модального окна:
-const Modal = lazy(() => import("../../../shared/ui/Modal"));
+const ClientModal = lazy(() => import("@features/clients/ui/ClientModal"));
 
-import { useClickOutside } from "../hooks/useClickOutside";
-import { useClientModals } from "../hooks/useClientModal";
-import { useClientTooltip } from "../hooks/useClientTooltip";
-import { formatContactValue } from "../lib/contactUtils";
-import { formatDateTime } from "../lib/dateUtils";
-import TooltipPortal from "./components/TooltipPortal";
-import SpinnerIcon from "./SpinnerIcon";
+import { useClickOutside } from "../../hooks/useClickOutside";
+import { useClientModals } from "../../hooks/useClientModal";
+import { useClientTooltip } from "../../hooks/useClientTooltip";
+import { formatContactValue } from "../../lib/contactUtils";
+import { formatDateTime } from "../../lib/dateUtils";
+import SpinnerIcon from "../components/SpinnerIcon";
+import TooltipPortal from "../components/TooltipPortal";
 
 const ContactIcons = ({ type }: { type: string }) => {
   switch (type.toLowerCase()) {
@@ -38,8 +38,8 @@ const ContactIcons = ({ type }: { type: string }) => {
   }
 };
 
-const Client: React.FC<{
-  client: ClientData;
+const ClientRow: React.FC<{
+  client: Client;
   filterText: string;
   fetchClients: () => void;
 }> = ({ client, filterText, fetchClients }) => {
@@ -111,7 +111,7 @@ const Client: React.FC<{
   return (
     <div
       className="grid-table-row border-b border-gray-200 py-2 h-[60px] bg-white text-sm"
-      onClick={() => handleClickClient(client.id)}
+      // onClick={() => handleClickClient(client.id)}
     >
       <div className="grid-table-cell-id pl-5 pr-2 text-txt-grey text-xs break-all">
         {client.id}
@@ -208,7 +208,7 @@ const Client: React.FC<{
       </div>
 
       <Suspense fallback={null}>
-        <Modal
+        <ClientModal
           isOpen={isEditModalOpen}
           isEditing={true}
           isDelete={false}
@@ -216,20 +216,20 @@ const Client: React.FC<{
           onSave={closeEditModal}
           onUpdate={handleUpdateClient}
           onDelete={handleDeleteClient}
-          clientData={client}
+          client={client}
         />
-        <Modal
+        <ClientModal
           isOpen={isDeleteModalOpen}
           isEditing={false}
           isDelete={true}
           onClose={closeDeleteModal}
           onUpdate={closeDeleteModal}
           onDelete={handleDeleteClient}
-          clientData={client}
+          client={client}
         />
       </Suspense>
     </div>
   );
 };
 
-export default Client;
+export default ClientRow;

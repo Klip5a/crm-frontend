@@ -1,4 +1,4 @@
-import arrowSort from "../../../shared/assets/arrow-sort.svg";
+import arrowSort from "@shared/assets/arrow-sort.svg";
 
 interface ClientTableHeaderProps {
   onSort: (field: string, order: "asc" | "desc") => void;

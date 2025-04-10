@@ -1,9 +1,10 @@
 import { AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
+import NotificationItem from "./NotificationItem";
+
 import notificationService from "../../services/notification";
 import { Notification } from "../../services/notification/type";
-import NotificationItem from "./NotificationItem";
 
 const NotificationContainer: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>(

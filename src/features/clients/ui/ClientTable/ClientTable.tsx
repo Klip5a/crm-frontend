@@ -1,11 +1,12 @@
-import { ClientData } from "../../../entities/client/types";
-import Client from "./Client";
+import { Client } from "@entities/client/types";
+
+import ClientRow from "./ClientRow";
 import ClientTableHeader from "./ClientTableHeader";
 import ClientTableSkeleton from "./ClientTableSkeleton";
 
 interface ClientTableProps {
   isLoading: boolean;
-  clients: ClientData[];
+  clients: Client[];
   searchQuery: string;
   sortField: string | null;
   sortOrder: "asc" | "desc";
@@ -32,7 +33,7 @@ const ClientTable: React.FC<ClientTableProps> = ({
                 .fill(0)
                 .map((_, index) => <ClientTableSkeleton key={index} />)
             : clients.map((client) => (
-                <Client
+                <ClientRow
                   key={client.id}
                   client={client}
                   filterText={searchQuery}

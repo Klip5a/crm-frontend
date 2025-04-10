@@ -1,10 +1,10 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 
-const LoginPage = lazy(() => import("../../pages/auth/Login"));
-const RegisterPage = lazy(() => import("../../pages/auth/Register"));
-const CrmPage = lazy(() => import("../../pages/crm/"));
-const ClientPage = lazy(() => import("../../pages/client"));
+const LoginPage = lazy(() => import("@pages/auth/Login"));
+const RegisterPage = lazy(() => import("@pages/auth/Register"));
+const CrmPage = lazy(() => import("@pages/crm/"));
+const ClientPage = lazy(() => import("@pages/client"));
 
 function AppRouter() {
   return (

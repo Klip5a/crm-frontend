@@ -1,51 +1,18 @@
-import { useLayoutEffect, useState } from "react";
-
-import { ClientData } from "../../../entities/client";
-import { useModalForm } from "./hooks/useModalForm";
-import ModalBody from "./ModalBody";
-import ModalFooter from "./ModalFooter";
-import ModalHeader from "./ModalHeader";
+import React, { useLayoutEffect, useState } from "react";
 
 export interface ModalProps {
   isOpen: boolean;
-  isEditing: boolean;
-  isDelete: boolean;
   onClose: () => void;
-  onSave?: (data: ClientData) => void;
-  onUpdate?: (data: ClientData) => void;
-  onDelete: () => void;
-  clientData?: ClientData;
+  children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = (props) => {
-  const {
-    name,
-    lastName,
-    surname,
-    contacts,
-    errorsValidate,
-    validationError,
-    validationAttempt,
-    setName,
-    setLastName,
-    setSurname,
-    addContactForm,
-    handleSave,
-    handleDelete,
-    handleClose,
-    handleContactTypeChange,
-    handleContactValueChange,
-    handleDeleteContact,
-  } = useModalForm(props);
-  // Локальное состояние для подтверждения удаления в режиме редактирования
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  //
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [animate, setAnimate] = useState(false);
   const animationDuration = 500;
 
   useLayoutEffect(() => {
-    if (props.isOpen) {
+    if (isOpen) {
       setShouldRender(true);
       // Используем requestAnimationFrame для гарантии применения стилей до анимации
       requestAnimationFrame(() => {
@@ -58,27 +25,9 @@ const Modal: React.FC<ModalProps> = (props) => {
       const timer = setTimeout(() => setShouldRender(false), animationDuration);
       return () => clearTimeout(timer);
     }
-  }, [props.isOpen]);
+  }, [isOpen]);
 
   if (!shouldRender) return null;
-
-  // Если редактирование – при первом клике переходим в режим подтверждения
-  const triggerConfirmDelete = () => {
-    setConfirmDelete(true);
-  };
-
-  // Если пользователь решает отменить подтверждение, сбрасываем confirmDelete
-  const cancelConfirmDelete = () => {
-    setConfirmDelete(false);
-  };
-
-  // Если подтверждение уже установлено – выполняем реальное удаление
-  const handleDeleteFinal = () => {
-    handleDelete();
-  };
-
-  // Для редактирования вместо props.isDelete используем локальное состояние
-  const deletionMode = props.isEditing ? confirmDelete : props.isDelete;
 
   return (
     <div
@@ -105,44 +54,7 @@ const Modal: React.FC<ModalProps> = (props) => {
           ${animate ? "scale-100" : "scale-95"}
         `}
       >
-        <ModalHeader
-          isDelete={deletionMode}
-          isEditing={props.isEditing}
-          clientData={props.clientData}
-          onClose={props.isEditing && confirmDelete ? cancelConfirmDelete : handleClose}
-        />
-        {deletionMode ? null : (
-          <ModalBody
-            isEditing={props.isEditing}
-            contacts={contacts}
-            name={name}
-            lastName={lastName}
-            surname={surname}
-            errorsValidate={errorsValidate}
-            validationError={validationError}
-            validationAttempt={validationAttempt}
-            onNameChange={setName}
-            onLastNameChange={setLastName}
-            onSurnameChange={setSurname}
-            onContactTypeChange={handleContactTypeChange}
-            onContactValueChange={handleContactValueChange}
-            onAddContact={addContactForm}
-            onContactDelete={handleDeleteContact}
-          />
-        )}
-        <ModalFooter
-          isDelete={deletionMode}
-          isEditing={props.isEditing}
-          onSave={handleSave}
-          onDelete={
-            props.isEditing
-              ? confirmDelete
-                ? handleDeleteFinal
-                : triggerConfirmDelete
-              : handleDelete
-          }
-          onClose={props.isEditing && confirmDelete ? cancelConfirmDelete : handleClose}
-        />
+        {children}
       </div>
     </div>
   );
