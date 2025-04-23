@@ -1,7 +1,8 @@
-import { lazy, Suspense, useState } from "react";
-import { useNavigate } from "react-router";
+import { useState } from "react";
 
+// import { useNavigate } from "react-router";
 import { Client } from "@entities/client/types";
+import { useOpenModal } from "@features/clients/hooks/useOpenModal";
 import cancelIcon from "@shared/assets/cancel.svg";
 import contactIcon from "@shared/assets/contact.svg";
 import editIcon from "@shared/assets/edit.svg";
@@ -11,10 +12,9 @@ import phoneIcon from "@shared/assets/phone.svg";
 import vkIcon from "@shared/assets/vk.svg";
 
 // Ленивый импорт модального окна:
-const ClientModal = lazy(() => import("@features/clients/ui/ClientModal"));
-
+// const ClientModal = lazy(() => import("@features/clients/ui/ClientModal"));
 import { useClickOutside } from "../../hooks/useClickOutside";
-import { useClientModals } from "../../hooks/useClientModal";
+import { useClientModal } from "../../hooks/useClientModal";
 import { useClientTooltip } from "../../hooks/useClientTooltip";
 import { formatContactValue } from "../../lib/contactUtils";
 import { formatDateTime } from "../../lib/dateUtils";
@@ -41,8 +41,9 @@ const ContactIcons = ({ type }: { type: string }) => {
 const ClientRow: React.FC<{
   client: Client;
   filterText: string;
-  fetchClients: () => void;
-}> = ({ client, filterText, fetchClients }) => {
+}> = ({ client, filterText }) => {
+  const { editClient, deleteClient } = useOpenModal();
+
   const [expanded, setExpanded] = useState<boolean>(false);
   const [tooltipTarget, setTooltipTarget] = useState<HTMLDivElement | null>(null);
 
@@ -60,15 +61,15 @@ const ClientRow: React.FC<{
   } = useClientTooltip();
 
   const {
-    isEditModalOpen,
-    isDeleteModalOpen,
-    isDeleting,
-    isUpdating,
-    openEditModal,
-    openDeleteModal,
-    closeEditModal,
-    closeDeleteModal,
-  } = useClientModals();
+    // isEditModalOpen,
+    // isDeleteModalOpen,
+    isEditing,
+    isDelete,
+    // openEditModal,
+    // openDeleteModal,
+    // closeEditModal,
+    // closeDeleteModal,
+  } = useClientModal();
 
   const tooltipRef = useClickOutside(resetTooltip);
 
@@ -78,20 +79,18 @@ const ClientRow: React.FC<{
     setExpanded(!expanded);
   };
 
-  const handleUpdateClient = () => {
-    closeEditModal();
-    fetchClients();
-  };
+  // const handleUpdateClient = () => {
+  //   closeEditModal();
+  // };
 
-  const handleDeleteClient = () => {
-    closeDeleteModal();
-    fetchClients();
-  };
+  // const handleDeleteClient = () => {
+  //   closeDeleteModal();
+  // };
 
-  const navigate = useNavigate();
-  const handleClickClient = (clientId: number) => {
-    navigate(`/clients/${clientId}`);
-  };
+  // const navigate = useNavigate();
+  // const handleClickClient = (clientId: number) => {
+  //   navigate(`/clients/${clientId}`);
+  // };
 
   // Функция подсветки совпадений
   const highlightMatches = (name: string) => {
@@ -183,31 +182,31 @@ const ClientRow: React.FC<{
       </div>
 
       <div className="grid-table-cell-actions flex flex-col lg:flex-row justify-between lg:pr-5">
-        {isUpdating ? (
-          <button className="flex items-center text-firm" onClick={openEditModal}>
+        {isEditing ? (
+          <button className="flex items-center text-firm" onClick={() => editClient(client)}>
             <SpinnerIcon color="#9873ff" />
             Изменить
           </button>
         ) : (
-          <button className="flex items-center hover:text-firm" onClick={openEditModal}>
+          <button className="flex items-center hover:text-firm" onClick={() => editClient(client)}>
             <img src={editIcon} alt="" />
             Изменить
           </button>
         )}
-        {isDeleting ? (
-          <button className="flex items-center text-red" onClick={openDeleteModal}>
+        {isDelete ? (
+          <button className="flex items-center text-red" onClick={() => deleteClient(client)}>
             <SpinnerIcon color="#f06a4d" />
             Удалить
           </button>
         ) : (
-          <button className="flex items-center hover:text-red" onClick={openDeleteModal}>
+          <button className="flex items-center hover:text-red" onClick={() => deleteClient(client)}>
             <img src={cancelIcon} alt="" />
             Удалить
           </button>
         )}
       </div>
 
-      <Suspense fallback={null}>
+      {/* <Suspense fallback={null}>
         <ClientModal
           isOpen={isEditModalOpen}
           isEditing={true}
@@ -227,7 +226,7 @@ const ClientRow: React.FC<{
           onDelete={handleDeleteClient}
           client={client}
         />
-      </Suspense>
+      </Suspense> */}
     </div>
   );
 };

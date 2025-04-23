@@ -1,110 +1,152 @@
-import { useState } from "react";
+import { motion } from "framer-motion";
 
-import { Client } from "@entities/client";
+import { useClientForm } from "@features/clients/hooks/useClientForm";
+import { useClientModal } from "@features/clients/hooks/useClientModal";
+import { useClients } from "@features/clients/hooks/useClients";
+import { useOpenModal } from "@features/clients/hooks/useOpenModal";
 import Modal from "@shared/ui/Modal";
 
+import AddContactButton from "./components/AddContactButton";
+import ContactForm from "./components/ContactForm";
+import FloatingLabelInput from "./components/FloatingLabelInput";
 import ModalBody from "./ModalBody";
 import ModalFooter from "./ModalFooter";
 import ModalHeader from "./ModalHeader";
 
 import { useModalForm } from "../../hooks/useModalForm";
 
-export interface ClientModalProps {
-  isOpen: boolean;
-  isEditing: boolean;
-  isDelete: boolean;
-  onClose: () => void;
-  onSave?: (data: Client) => void;
-  onUpdate?: (data: Client) => void;
-  onDelete: () => void;
-  client?: Client;
-}
+const ClientModal = () => {
+  const { isOpen, selectedClient, isEditing, isDelete } = useClientModal();
+  const { close } = useOpenModal();
 
-const ClientModal: React.FC<ClientModalProps> = (props) => {
-  const {
-    name,
-    lastName,
-    surname,
-    contacts,
-    errorsValidate,
-    validationError,
-    validationAttempt,
-    setName,
-    setLastName,
-    setSurname,
-    addContactForm,
-    handleSave,
-    handleDelete,
-    handleClose,
-    handleContactTypeChange,
-    handleContactValueChange,
-    handleDeleteContact,
-  } = useModalForm(props);
+  const { formData, setFormData, resetFields, updateFields, clientObject } =
+    useClientForm(selectedClient);
 
-  // Локальное состояние для подтверждения удаления в режиме редактирования
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  //
+  // const { createClient, updateClient, deleteClient } = useClients();
+  // const {
+  //   name,
+  //   lastName,
+  //   surname,
+  //   contacts,
+  //   errorsValidate,
+  //   validationError,
+  //   validationAttempt,
+  //   setName,
+  //   setLastName,
+  //   setSurname,
+  //   addContactForm,
+  //   handleSave,
+  //   handleDelete,
+  //   handleContactTypeChange,
+  //   handleContactValueChange,
+  //   handleDeleteContact,
+  // } = useModalForm({
+  //   isOpen,
+  //   isEditing,
+  //   isDelete,
+  //   client: selectedClient,
+  //   close,
+  //   createClient,
+  //   updateClient,
+  //   deleteClient,
+  // });
 
-  // Если редактирование – при первом клике переходим в режим подтверждения
-  const triggerConfirmDelete = () => {
-    setConfirmDelete(true);
-  };
-
-  // Если пользователь решает отменить подтверждение, сбрасываем confirmDelete
-  const cancelConfirmDelete = () => {
-    setConfirmDelete(false);
-  };
-
-  // Если подтверждение уже установлено – выполняем реальное удаление
-  const handleDeleteFinal = () => {
-    handleDelete();
-  };
-
-  // Для редактирования вместо props.isDelete используем локальное состояние
-  const deletionMode = props.isEditing ? confirmDelete : props.isDelete;
+  const contactsNodes = formData.contacts.map((contact, index) => (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      style={{ position: "relative", zIndex: 10 - index }}
+    >
+      <ContactForm
+        clientContact={contact}
+        index={index}
+        contacts={formData.contacts}
+        isNewContact={contact.isNew}
+        errorMessage={errorsValidate[`contact_${index}`]}
+        validationAttempt={validationAttempt}
+        handleChangeType={handleContactTypeChange}
+        handleChangeValue={handleContactValueChange}
+        handleDelete={() => handleDeleteContact(index)}
+      />
+    </motion.div>
+  ));
 
   return (
-    <Modal
-      isOpen={props.isOpen}
-      onClose={props.isEditing && confirmDelete ? cancelConfirmDelete : handleClose}
-    >
+    <Modal isOpen={isOpen}>
       <ModalHeader
-        isDelete={deletionMode}
-        isEditing={props.isEditing}
-        client={props.client}
-        onClose={props.isEditing && confirmDelete ? cancelConfirmDelete : handleClose}
+        isDelete={isDelete}
+        isEditing={isEditing}
+        selectedClient={selectedClient}
+        onClose={close}
       />
-      {deletionMode ? null : (
+      {isDelete ? null : (
         <ModalBody
-          isEditing={props.isEditing}
-          contacts={contacts}
-          name={name}
-          lastName={lastName}
-          surname={surname}
-          errorsValidate={errorsValidate}
+          // isEditing={isEditing}
+          // contacts={contacts}
+          // name={name}
+          // lastName={lastName}
+          // surname={surname}
+          inputs={
+            <>
+              <FloatingLabelInput
+                label="Фамилия"
+                // id="last_name"
+                value={formData.lastName}
+                onValueChange={(val) => {
+                  updateFields("lastName", val);
+                }}
+                isEditing={isEditing}
+                error={errorsValidate.lastName}
+                validationAttempt={validationAttempt}
+              />
+              <FloatingLabelInput
+                label="Имя"
+                // id="first_name"
+                value={formData.name}
+                onValueChange={(val) => {
+                  updateFields("name", val);
+                }}
+                error={errorsValidate.name}
+                isEditing={isEditing}
+              />
+              <FloatingLabelInput
+                label="Отчество"
+                // id="middle_name"
+                value={formData.surname}
+                onValueChange={(val) => {
+                  updateFields("surname", val);
+                }}
+                error={errorsValidate.surname}
+                isEditing={isEditing}
+              />
+            </>
+          }
+          contacts={contactsNodes}
+          hasContacts={formData.contacts.length > 0}
+          addContact={
+            <AddContactButton onClick={addContactForm} hasContacts={formData.contacts.length > 0} />
+          }
           validationError={validationError}
-          validationAttempt={validationAttempt}
-          onNameChange={setName}
-          onLastNameChange={setLastName}
-          onSurnameChange={setSurname}
-          onContactTypeChange={handleContactTypeChange}
-          onContactValueChange={handleContactValueChange}
-          onAddContact={addContactForm}
-          onContactDelete={handleDeleteContact}
+          // errorsValidate={errorsValidate}
+          // validationAttempt={validationAttempt}
+          // onNameChange={setName}
+          // onLastNameChange={setLastName}
+          // onSurnameChange={setSurname}
+          // onContactTypeChange={handleContactTypeChange}
+          // onContactValueChange={handleContactValueChange}
+          // onAddContact={addContactForm}
+          // onContactDelete={handleDeleteContact}
         />
       )}
       <ModalFooter
-        isDelete={deletionMode}
-        isEditing={props.isEditing}
+        isDelete={isDelete}
+        isEditing={isEditing}
         onSave={handleSave}
-        onDelete={
-          props.isEditing
-            ? confirmDelete
-              ? handleDeleteFinal
-              : triggerConfirmDelete
-            : handleDelete
-        }
-        onClose={props.isEditing && confirmDelete ? cancelConfirmDelete : handleClose}
+        onDelete={handleDelete}
+        onClose={close}
       />
     </Modal>
   );

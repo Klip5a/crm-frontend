@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback } from "react";
 
-import AddContactButton from "./components/AddContactButton";
-import ContactForm from "./components/ContactForm";
-import FloatingLabelInput from "./components/FloatingLabelInput";
+// import React from "react";
+// import React, { useCallback } from "react";
+// import AddContactButton from "./components/AddContactButton";
+// import ContactForm from "./components/ContactForm";
 
-import { ClientContactExtended } from "../../hooks/useModalForm";
+// import FloatingLabelInput from "./components/FloatingLabelInput";
+// import { ClientContactExtended } from "../../hooks/useModalForm";
 
 const ANIMATION_CONFIG = {
   duration: 0.3,
@@ -15,92 +16,41 @@ const ANIMATION_CONFIG = {
 const CONTACTS_BG_STYLE = { backgroundColor: "rgba(200, 197, 209, 0.3)" } as const;
 
 interface ModalBodyProps {
-  isEditing: boolean;
-  contacts: ClientContactExtended[];
-  name: string;
-  lastName: string;
-  surname: string;
-  errorsValidate: Record<string, string>;
+  // isEditing: boolean;
+  // contacts: ClientContactExtended[];
+  // name: string;
+  // lastName: string;
+  // surname: string;
+  inputs: React.ReactNode;
+  contacts: React.ReactNode;
+  hasContacts: boolean;
+  addContact: React.ReactNode;
+  // errorsValidate: Record<string, string>;
   validationError: string;
-  validationAttempt: number;
-  onNameChange: (value: string) => void;
-  onLastNameChange: (value: string) => void;
-  onSurnameChange: (value: string) => void;
-  onContactTypeChange: (index: number, value: string) => void;
-  onContactValueChange: (index: number, value: string) => void;
-  onAddContact: () => void;
-  onContactDelete: (index: number) => void;
+  // validationAttempt: number;
+  // onNameChange: (value: string) => void;
+  // onLastNameChange: (value: string) => void;
+  // onSurnameChange: (value: string) => void;
+  // onContactTypeChange: (index: number, value: string) => void;
+  // onContactValueChange: (index: number, value: string) => void;
+  // onAddContact: () => void;
+  // onContactDelete: (index: number) => void;
 }
 
 const ModalBody: React.FC<ModalBodyProps> = ({
-  isEditing,
+  inputs,
   contacts,
-  name,
-  lastName,
-  surname,
-  errorsValidate,
+  hasContacts,
+  addContact,
   validationError,
-  validationAttempt,
-  onNameChange,
-  onLastNameChange,
-  onSurnameChange,
-  onContactTypeChange,
-  onContactValueChange,
-  onAddContact,
-  onContactDelete,
+  // onAddContact,
 }) => {
-  const hasContacts = contacts.length > 0;
-
-  const handleLastNameUpdate = useCallback(
-    (value: string) => {
-      onLastNameChange(value);
-    },
-    [onLastNameChange]
-  );
-
-  const handleNameUpdate = useCallback(
-    (value: string) => {
-      onNameChange(value);
-    },
-    [onNameChange]
-  );
-
-  const handleSurnameUpdate = useCallback(
-    (value: string) => {
-      onSurnameChange(value);
-    },
-    [onSurnameChange]
-  );
+  // const hasContacts = contacts.length > 0;
 
   return (
     <>
       <div className="px-7 pb-2">
-        <div className="mt-4">
-          <FloatingLabelInput
-            label="Фамилия"
-            id="last_name"
-            value={lastName}
-            onValueChange={handleLastNameUpdate}
-            error={errorsValidate.lastName}
-            isEditing={isEditing}
-          />
-          <FloatingLabelInput
-            label="Имя"
-            id="first_name"
-            value={name}
-            onValueChange={handleNameUpdate}
-            error={errorsValidate.name}
-            isEditing={isEditing}
-          />
-          <FloatingLabelInput
-            label="Отчество"
-            id="middle_name"
-            value={surname}
-            onValueChange={handleSurnameUpdate}
-            error={errorsValidate.surname}
-            isEditing={isEditing}
-          />
-        </div>
+        <div className="mt-4">{inputs}</div>
       </div>
       <div style={CONTACTS_BG_STYLE} className="relative">
         <motion.div
@@ -112,31 +62,7 @@ const ModalBody: React.FC<ModalBodyProps> = ({
           }}
           transition={ANIMATION_CONFIG}
         >
-          <AnimatePresence initial={false}>
-            {contacts.map((contact, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={ANIMATION_CONFIG}
-                style={{ position: "relative", zIndex: 10 - index }}
-              >
-                <ContactForm
-                  clientContact={contact}
-                  index={index}
-                  contacts={contacts}
-                  isEditing={!contact.isNew}
-                  isNewContact={contact.isNew}
-                  errorMessage={errorsValidate[`contact_${index}`]}
-                  validationAttempt={validationAttempt}
-                  handleChangeType={onContactTypeChange}
-                  handleChangeValue={onContactValueChange}
-                  handleDelete={() => onContactDelete(index)}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          <AnimatePresence initial={false}>{contacts}</AnimatePresence>
         </motion.div>
 
         <motion.div
@@ -145,7 +71,7 @@ const ModalBody: React.FC<ModalBodyProps> = ({
           }}
           transition={ANIMATION_CONFIG}
         >
-          <AddContactButton onClick={onAddContact} hasContacts={hasContacts} />
+          {addContact}
         </motion.div>
       </div>
 

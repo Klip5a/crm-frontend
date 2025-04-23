@@ -2,11 +2,10 @@ import React, { useLayoutEffect, useState } from "react";
 
 export interface ModalProps {
   isOpen: boolean;
-  onClose: () => void;
   children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, children }) => {
   const [shouldRender, setShouldRender] = useState<boolean>(false);
   const [animate, setAnimate] = useState(false);
   const animationDuration = 500;
@@ -14,7 +13,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   useLayoutEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      // Используем requestAnimationFrame для гарантии применения стилей до анимации
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setAnimate(true);

@@ -1,13 +1,16 @@
+import { Client } from "@entities/client";
 import arrowSort from "@shared/assets/arrow-sort.svg";
 
+export type Field = keyof Client;
+
 interface ClientTableHeaderProps {
-  onSort: (field: string, order: "asc" | "desc") => void;
-  sortField: string | null;
+  onSort: (field: Field, order: "asc" | "desc") => void;
+  sortField: Field | null;
   sortOrder: "asc" | "desc";
 }
 
 const ClientTableHeader: React.FC<ClientTableHeaderProps> = ({ onSort, sortField, sortOrder }) => {
-  const handleSort = (field: string) => {
+  const handleSort = (field: Field) => {
     const newOrder = sortField === field && sortOrder === "asc" ? "desc" : "asc";
     onSort(field, newOrder);
   };

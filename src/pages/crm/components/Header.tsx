@@ -1,12 +1,17 @@
-import { useState } from "react";
+import React, { ChangeEvent } from "react";
 
-const Header = ({ onSearch }: { onSearch: (query: string) => void }) => {
-  const [searchQuery, setSearchQuery] = useState("");
+interface HeaderProps {
+  value: string;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}
 
-  function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setSearchQuery(event.target.value);
-    onSearch(event.target.value);
-  }
+const Header: React.FC<HeaderProps> = ({ value, onChange }) => {
+  // const [searchQuery, setSearchQuery] = useState("");
+
+  // function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
+  //   setSearchQuery(event.target.value);
+  //   onSearch(event.target.value);
+  // }
 
   return (
     <header className="bg-white">
@@ -16,8 +21,8 @@ const Header = ({ onSearch }: { onSearch: (query: string) => void }) => {
         </div>
         <form className="hidden sm:block w-[80%] max-w-[580px]">
           <input
-            value={searchQuery}
-            onChange={handleSearchChange}
+            value={value}
+            onChange={onChange}
             className="w-full h-[44px] ml-[53px] border-[1px] border-[rgba(51, 51, 51, 0.2)] px-[16px] placeholder:text-txt-grey outline-none"
             placeholder="Введите запрос"
             type="search"

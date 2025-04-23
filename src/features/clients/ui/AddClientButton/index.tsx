@@ -1,8 +1,4 @@
-interface AddClientButtonProps {
-  onClick: () => void;
-}
-
-const AddClientButton: React.FC<AddClientButtonProps> = ({ onClick }) => {
+const AddClientButton = ({ onClick }: { onClick: () => void }) => {
   return (
     <button
       className="

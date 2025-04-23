@@ -1,38 +1,56 @@
-import { useCallback, useState } from "react";
+// import { useState } from "react";
 
-export const useClientModals = () => {
-  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+import { useAppSelector } from "@shared/lib/redux";
 
-  const openEditModal = useCallback(() => {
-    setIsUpdating(true);
-    setTimeout(() => {
-      setIsUpdating(false);
-      setIsEditModalOpen(true);
-    }, 1000);
-  }, []);
+import { selectClientModal } from "../model/slice/modalSlice";
 
-  const openDeleteModal = useCallback(() => {
-    setIsDeleting(true);
-    setTimeout(() => {
-      setIsDeleting(false);
-      setIsDeleteModalOpen(true);
-    }, 1000);
-  }, []);
+export const useClientModal = () => {
+  // const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  // const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  // const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  const closeEditModal = () => setIsEditModalOpen(false);
-  const closeDeleteModal = () => setIsDeleteModalOpen(false);
+  // const openEditModal = useCallback(() => {
+  //   setIsUpdating(true);
+  //   setTimeout(() => {
+  //     setIsUpdating(false);
+  //     setIsEditModalOpen(true);
+  //   }, 1000);
+  // }, []);
+
+  // const openDeleteModal = useCallback(() => {
+  //   setIsDeleting(true);
+  //   setTimeout(() => {
+  //     setIsDeleting(false);
+  //     setIsDeleteModalOpen(true);
+  //   }, 1000);
+  // }, []);
+
+  // const closeEditModal = () => setIsEditModalOpen(false);
+  // const closeDeleteModal = () => setIsDeleteModalOpen(false);
+
+  const { isOpen, modalType, selectedClient } = useAppSelector(selectClientModal);
+  // const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const isEditing = modalType === "edit";
+  const isDelete = modalType === "delete";
+
+  // const deletionMode = isEditing ? confirmDelete : isDelete;
 
   return {
-    isEditModalOpen,
-    isDeleteModalOpen,
-    isDeleting,
-    isUpdating,
-    openEditModal,
-    openDeleteModal,
-    closeEditModal,
-    closeDeleteModal,
+    isOpen,
+    selectedClient,
+    isEditing,
+    isDelete,
+    // deletionMode,
+    // setConfirmDelete,
+    // isEditModalOpen,
+    // isDeleteModalOpen,
+    // isDeleting,
+    // isUpdating,
+    // openEditModal,
+    // openDeleteModal,
+    // closeEditModal,
+    // closeDeleteModal,
   };
 };

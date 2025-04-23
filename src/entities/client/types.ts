@@ -2,12 +2,8 @@ export interface ClientContact {
   type: string;
   value: string;
 }
-
-/**
- *
- */
 export interface Client {
-  id: number;
+  id: string;
   name: string;
   lastName: string;
   surname: string;

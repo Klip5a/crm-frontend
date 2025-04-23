@@ -1,28 +1,32 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { ClientContact, createClient, deleteClient, updateClient } from "@entities/client";
+import { Client, ClientContact } from "@entities/client";
+// import { Client, ClientContact, createClient, deleteClient, updateClient } from "@entities/client";
 import { useNotification } from "@shared/hooks/useNotification";
 
-import { ClientModalProps } from "../ui/ClientModal/";
-
-// не уверен, что это правильно, экспортировать или нет
-/**
- * Расширенный тип контакта, с добавлением свойства "isNew"
- */
-export interface ClientContactExtended extends ClientContact {
-  isNew: boolean;
+// export interface ClientContactExtended extends ClientContact {
+//   isNew: boolean;
+// }
+export interface UseModalFormProps {
+  isOpen: boolean;
+  isEditing: boolean;
+  isDelete: boolean;
+  client: Client | null;
+  close: () => void;
+  createClient: (c: Omit<Client, "id">) => Promise<void>;
+  updateClient: (c: Client) => Promise<void>;
+  deleteClient: (id: string) => Promise<void>;
 }
 
-/**
- * Hook управления состоянием формы редактирования/создания клиента.
- *
- * @param props - Свойства модального окна (данные клиента, флаги состояния, колбэки)
- * @returns Объект с состоянием формы, функциями управления состоянием и обработчиками событий
- *
- */
-export const useModalForm = (props: ClientModalProps) => {
-  const { isOpen, isEditing, onClose, onSave, onUpdate, onDelete, client } = props;
-
+export const useModalForm = ({
+  isOpen,
+  isEditing,
+  client: selectedClient,
+  close,
+  createClient,
+  updateClient,
+  deleteClient,
+}: UseModalFormProps) => {
   const { addNotification } = useNotification();
 
   // Локальные состояния формы
@@ -40,18 +44,18 @@ export const useModalForm = (props: ClientModalProps) => {
    * Если редактируем клиента и клиент существует, заполняем поля формы
    */
   useEffect(() => {
-    if (isOpen && isEditing && client) {
-      setLastName(client.lastName);
-      setName(client.name);
-      setSurname(client.surname);
+    if (isOpen && isEditing && selectedClient) {
+      setLastName(selectedClient.lastName);
+      setName(selectedClient.name);
+      setSurname(selectedClient.surname);
       setContacts(
-        client.contacts.map((contact) => ({
+        selectedClient.contacts.map((contact: ClientContact) => ({
           ...contact,
           isNew: false,
         }))
       );
     }
-  }, [isOpen, isEditing, client]);
+  }, [isOpen, isEditing, selectedClient]);
 
   /**
    * Добавление нового пустого контакта в список
@@ -135,70 +139,85 @@ export const useModalForm = (props: ClientModalProps) => {
     return isValid;
   };
 
-  const clientInfo = useMemo(() => {
-    const now = new Date().toISOString();
-    return {
-      id: client?.id || 0,
-      name,
-      lastName,
-      surname,
-      createdAt: client?.createdAt || now,
-      updatedAt: now,
-      contacts: contacts.filter((contact) => contact.type !== "" || contact.value !== ""),
-    };
-  }, [client, name, lastName, surname, contacts]);
+  // const clientInfo = useMemo(() => {
+  //   const now = new Date().toISOString();
+  //   return {
+  //     id: selectedClient?.id || 0,
+  //     name,
+  //     lastName,
+  //     surname,
+  //     createdAt: selectedClient?.createdAt || now,
+  //     updatedAt: now,
+  //     contacts: contacts.filter((contact) => contact.type !== "" || contact.value !== ""),
+  //   };
+  // }, [selectedClient, name, lastName, surname, contacts]);
 
   const handleSave = () => {
     if (!validateForm()) return;
 
-    if (isEditing) {
+    if (isEditing && selectedClient) {
       // Редактирование существующего клиента
-      updateClient(client?.id, clientInfo)
-        .then((updateClient) => {
-          // console.log("Клиент обновлен успешно:", updateClient);
-          addNotification("success", `Клиент ${updateClient.name} обновлен успешно`, 5000);
-          onUpdate?.(updateClient);
-          onClose();
+
+      const clientToUpdate: Client = {
+        id: selectedClient.id,
+        name,
+        lastName,
+        surname,
+        contacts: contacts.filter((contact) => contact.type !== "" || contact.value !== ""),
+        createdAt: selectedClient.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      updateClient(clientToUpdate)
+        .then(() => {
+          // console.log("Клиент обновлен успешно:", updatedClient);
+          addNotification("success", `Клиент ${clientToUpdate.name} обновлен успешно`, 5000);
+          close();
           resetFields();
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           console.error("Ошибка при обновлении клиента:", error);
           addNotification("error", "Ошибка обновления клиента", 5000);
         });
     } else {
-      // Создание нового клиента
-      createClient(clientInfo)
-        .then((createdClient) => {
-          console.log("Клиент создан успешно:", createdClient);
+      const newClient: Omit<Client, "id"> = {
+        name,
+        lastName,
+        surname,
+        contacts: contacts.filter((contact) => contact.type !== "" || contact.value !== ""),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      createClient(newClient)
+        .then(() => {
+          console.log("Клиент создан успешно:", newClient);
           addNotification("success", "Клиент создан успешно", 5000);
-          onSave?.(createdClient);
-          onClose();
+          close();
           resetFields();
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           console.error("Ошибка при создании клиента:", error);
         });
     }
   };
 
   const handleDelete = () => {
-    if (onDelete && client) {
-      deleteClient(client.id)
+    if (selectedClient) {
+      deleteClient(selectedClient.id)
         .then(() => {
           addNotification("success", "Клиент удален успешно", 5000);
-          onDelete();
-          onClose();
+          close();
           resetFields();
-          console.log("Клиент удален:", client.id);
+          console.log("Клиент удален:", selectedClient.id);
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           console.error("Ошибка при удалении клиента:", error);
         });
     }
   };
 
   const handleClose = () => {
-    onClose();
+    close();
     setTimeout(() => {
       resetFields();
     }, 500);
@@ -257,7 +276,6 @@ export const useModalForm = (props: ClientModalProps) => {
     errorsValidate,
     validationError,
     validationAttempt,
-    // isHovered,
     setName,
     setLastName,
     setSurname,
@@ -269,6 +287,5 @@ export const useModalForm = (props: ClientModalProps) => {
     handleContactTypeChange,
     handleContactValueChange,
     handleDeleteContact,
-    clientInfo,
   };
 };

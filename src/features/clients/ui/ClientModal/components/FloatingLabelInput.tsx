@@ -1,31 +1,20 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
+
+import { useShake } from "@features/clients/hooks/useShake";
 
 interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  error?: string;
-  isEditing?: boolean;
   value: string;
   onValueChange: (value: string) => void;
+  isEditing?: boolean;
+  error?: string;
+  validationAttempt?: number;
 }
 
 const FloatingLabelInput: React.FC<FloatingLabelInputProps> = memo(
-  ({ label, error, isEditing, value, onValueChange, className = "", ...rest }) => {
+  ({ label, error, isEditing, value, onValueChange, validationAttempt, ...rest }) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const [isShaking, setIsShaking] = useState(false);
-
-    useEffect(() => {
-      if (inputRef.current) {
-        inputRef.current.value = value;
-      }
-    }, [value]);
-
-    useEffect(() => {
-      if (error) {
-        setIsShaking(true);
-        const timer = setTimeout(() => setIsShaking(false), 500);
-        return () => clearTimeout(timer);
-      }
-    }, [error]);
+    const isShaking = useShake(!!error, validationAttempt);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       onValueChange(e.target.value);
@@ -58,7 +47,6 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = memo(
             border-b-[1px]
             peer
             ${error ? "border-red" : "border-gray"}
-            ${className}
           `}
         />
         <label
@@ -89,7 +77,8 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = memo(
     return (
       prevProps.value === nextProps.value &&
       prevProps.error === nextProps.error &&
-      prevProps.isEditing === nextProps.isEditing
+      prevProps.isEditing === nextProps.isEditing &&
+      prevProps.validationAttempt === nextProps.validationAttempt
     );
   }
 );

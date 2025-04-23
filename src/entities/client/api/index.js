@@ -1,9 +1,8 @@
 const BASE_URL = "http://localhost:3000/api/clients";
 
-export async function getClients(search = "") {
+async function getClients() {
   try {
     const url = new URL(BASE_URL);
-    url.searchParams.append("search", search);
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error("Failed to fetch clients");
@@ -15,7 +14,22 @@ export async function getClients(search = "") {
   }
 }
 
-export async function createClient(clientData) {
+async function searchClients(search = "") {
+  try {
+    const url = new URL(BASE_URL);
+    url.searchParams.append("search", search);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Failed to search clients");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+    throw error;
+  }
+}
+
+async function createClient(clientData) {
   try {
     const response = await fetch(BASE_URL, {
       method: "POST",
@@ -34,7 +48,7 @@ export async function createClient(clientData) {
   }
 }
 
-export async function getClientById(id) {
+async function getClientById(id) {
   try {
     const url = new URL(`${BASE_URL}/${id}`);
     const response = await fetch(url);
@@ -48,7 +62,7 @@ export async function getClientById(id) {
   }
 }
 
-export async function updateClient(id, clientData) {
+async function updateClient(id, clientData) {
   try {
     const url = new URL(`${BASE_URL}/${id}`);
     const response = await fetch(url, {
@@ -68,7 +82,7 @@ export async function updateClient(id, clientData) {
   }
 }
 
-export async function deleteClient(id) {
+async function deleteClient(id) {
   try {
     const url = new URL(`${BASE_URL}/${id}`);
     const response = await fetch(url, {
@@ -83,3 +97,5 @@ export async function deleteClient(id) {
     throw error;
   }
 }
+
+export { createClient, deleteClient, getClientById, getClients, searchClients, updateClient };

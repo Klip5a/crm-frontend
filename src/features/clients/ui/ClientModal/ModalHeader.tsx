@@ -4,11 +4,16 @@ import closeIcon from "@shared/assets/close.svg";
 interface ModalHeaderProps {
   isDelete: boolean;
   isEditing: boolean;
-  client?: Client;
+  selectedClient: Client | null;
   onClose: () => void;
 }
 
-const ModalHeader: React.FC<ModalHeaderProps> = ({ isDelete, isEditing, client, onClose }) => {
+const ModalHeader: React.FC<ModalHeaderProps> = ({
+  isDelete,
+  isEditing,
+  selectedClient,
+  onClose,
+}) => {
   return (
     <>
       {isDelete ? (
@@ -32,7 +37,9 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({ isDelete, isEditing, client, 
               {isEditing ? (
                 <>
                   Изменить данные
-                  <span className="ml-2 text-xs text-txt-grey font-normal">ID: {client?.id}</span>
+                  <span className="ml-2 text-xs text-txt-grey font-normal">
+                    ID: {selectedClient?.id}
+                  </span>
                 </>
               ) : (
                 <>Новый клиент</>
