@@ -7,6 +7,8 @@ import CustomSelect from "./CustomSelect";
 import { DeleteIcon } from "./DeleteIcon";
 
 import { formatPhoneNumber } from "../lib/phoneFormatter";
+import { useClientContact } from "@features/clients/hooks/useClientContact";
+import { ClientContactExtended } from "@features/clients/hooks/useClientForm";
 
 const CONTACT_TYPES = ["Телефон", "Доп. телефон", "Email", "VK", "Facebook", "Другое"] as const;
 const PHONE_TYPES = ["Телефон", "Доп. телефон"] as const;
@@ -20,14 +22,14 @@ const isPhoneTypeCheck = (type: string) =>
 interface ContactFormProps {
   index: number;
   clientContact: ClientContact;
-  contacts: ClientContact[];
+  contacts: ClientContactExtended[];
   isNewContact: boolean;
   // isEditing: boolean;
   errorMessage?: string;
   validationAttempt: number;
-  handleChangeType: (index: number, value: string) => void;
-  handleChangeValue: (index: number, value: string) => void;
-  handleDelete: (index: number) => void;
+  // handleChangeType: (index: number, value: string) => void;
+  // handleChangeValue: (index: number, value: string) => void;
+  // handleDelete: (index: number) => void;
 }
 
 const ContactForm: React.FC<ContactFormProps> = memo(
@@ -39,11 +41,13 @@ const ContactForm: React.FC<ContactFormProps> = memo(
     // isEditing,
     errorMessage,
     validationAttempt,
-    handleChangeType,
-    handleChangeValue,
-    handleDelete,
+    // handleChangeType,
+    // handleChangeValue,
+    // handleDelete,
   }) => {
     const isShaking = useShake(!!errorMessage, validationAttempt);
+    const { handleContactTypeChange, handleContactValueChange, handleDeleteContact } =
+      useClientContact(contacts);
 
     const [displayValue, setDisplayValue] = useState("");
 

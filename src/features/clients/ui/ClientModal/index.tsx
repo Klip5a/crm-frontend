@@ -67,9 +67,9 @@ const ClientModal = () => {
         isNewContact={contact.isNew}
         errorMessage={errorsValidate[`contact_${index}`]}
         validationAttempt={validationAttempt}
-        handleChangeType={handleContactTypeChange}
-        handleChangeValue={handleContactValueChange}
-        handleDelete={() => handleDeleteContact(index)}
+        // handleChangeType={handleContactTypeChange}
+        // handleChangeValue={handleContactValueChange}
+        // handleDelete={() => handleDeleteContact(index)}
       />
     </motion.div>
   ));

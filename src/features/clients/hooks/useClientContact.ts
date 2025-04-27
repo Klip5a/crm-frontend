@@ -1,48 +1,66 @@
-import { useCallback, useState } from "react";
+import { ClientContactExtended } from "./useClientForm";
 
-import { ClientContact } from "@entities/client";
+type UseClientContactProps = {
+  contacts: ClientContactExtended[];
+  setContacts: (contacts: ClientContactExtended[]) => void;
+};
 
-export interface ClientContactExtended extends ClientContact {
-  isNew: boolean;
+function updateAtIndex<T>(array: readonly T[], index: number, updater: (item: T) => T): T[] {
+  return array.map((item, i) => (i === index ? updater(item) : item));
 }
 
-export function useClientContact() {
+export function useClientContact({ contacts, setContacts }: UseClientContactProps) {
   // setContacts: React.Dispatch<React.SetStateAction<ClientContactExtended[]>>
   // const [contacts, setContacts] = useState<ClientContactExtended[]>([]);
 
-  const addContact = useCallback(() => {
-    setContacts((prevForms) => [...prevForms, { type: "", value: "", isNew: true }]);
-  }, [setContacts]);
+  const addContact = () => {
+    // setContacts((prevForms) => [...prevForms, { type: "", value: "", isNew: true }]);
+    setContacts([...contacts, { type: "", value: "", isNew: true }]);
+  };
 
-  const handleContactTypeChange = useCallback(
-    (index: number, value: string) => {
-      setContacts((prevForms) => {
-        const updateForms = [...prevForms];
-        if (updateForms[index]) {
-          updateForms[index].type = value;
-        }
-        return updateForms;
-      });
-    },
-    [setContacts]
-  );
+  const handleContactTypeChange = (index: number, value: string) => {
+    // setContacts((prevForms) => {
+    //   const updateForms = [...prevForms];
+    //   if (updateForms[index]) {
+    //     updateForms[index].type = value;
+    //   }
+    //   return updateForms;
+    // });
+    setContacts(
+      updateAtIndex(contacts, index, (c) => ({
+        ...c,
+        type: value,
+      }))
+    );
+  };
 
   const handleContactValueChange = (index: number, value: string) => {
-    setContacts((prevForms) => {
-      const updatedForms = [...prevForms];
-      if (updatedForms[index]) {
-        updatedForms[index].value = value;
-      }
-      return updatedForms;
-    });
+    // setContacts((prevForms) => {
+    //   const updatedForms = [...prevForms];
+    //   if (updatedForms[index]) {
+    //     updatedForms[index].value = value;
+    //   }
+    //   return updatedForms;
+    // });
+    setContacts(
+      updateAtIndex(contacts, index, (c) => ({
+        ...c,
+        value,
+      }))
+    );
   };
 
   const handleDeleteContact = (index: number) => {
-    setContacts((prevForms) => {
-      const updatedForms = [...prevForms];
-      updatedForms.splice(index, 1);
-      return updatedForms.map((form, idx) => ({ ...form, index: idx }));
-    });
+    // setContacts((prevForms) => {
+    //   const updatedForms = [...prevForms];
+    //   updatedForms.splice(index, 1);
+    //   return updatedForms.map((form, idx) => ({ ...form, index: idx }));
+    // });
+    setContacts(
+      contacts.filter((_, i) => {
+        i !== index;
+      })
+    );
 
     // Удаляем ошибку для контакта
     // setErrorsValidate((prevErrors) => {
@@ -54,8 +72,8 @@ export function useClientContact() {
   };
 
   return {
-    contacts,
-    setContacts,
+    // contacts,
+    // setContacts,
     addContact,
     handleContactTypeChange,
     handleContactValueChange,
