@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 
 import { useClientForm } from "@features/clients/hooks/useClientForm";
-import { useClientModal } from "@features/clients/hooks/useClientModal";
 import { useClients } from "@features/clients/hooks/useClients";
+import { useClientModal } from "@features/clients/hooks/useModal";
 import { useOpenModal } from "@features/clients/hooks/useOpenModal";
 import Modal from "@shared/ui/Modal";
 

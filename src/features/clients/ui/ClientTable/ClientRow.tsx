@@ -13,9 +13,9 @@ import vkIcon from "@shared/assets/vk.svg";
 
 // Ленивый импорт модального окна:
 // const ClientModal = lazy(() => import("@features/clients/ui/ClientModal"));
-import { useClickOutside } from "../../hooks/useClickOutside";
-import { useClientModal } from "../../hooks/useClientModal";
-import { useClientTooltip } from "../../hooks/useClientTooltip";
+import { useClickOutside } from "../../../../shared/hooks/useClickOutside";
+import { useClientModal } from "../../hooks/useModal";
+import { useClientTooltip } from "../../hooks/useTooltip";
 import { formatContactValue } from "../../lib/contactUtils";
 import { formatDateTime } from "../../lib/dateUtils";
 import SpinnerIcon from "../components/SpinnerIcon";
