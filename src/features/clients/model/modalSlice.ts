@@ -1,12 +1,13 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 
-import { RootState } from "@app/store";
 import { Client } from "@entities/client";
+
+import { CrmRootState } from "../store/clientLocalStore";
 
 export type ModalType = "create" | "edit" | "delete" | null;
 
-interface ClientModalSlice {
+export interface ClientModalSlice {
   isOpen: boolean;
   modalType: ModalType;
   selectedClient: Client | null;
@@ -42,12 +43,15 @@ const clientModalSlice = createSlice({
       state.modalType = null;
       // Не очищаем selectedClient сразу для плавной анимации закрытия
     },
+    clearModalData: (state) => {
+      state.selectedClient = null;
+    },
   },
 });
 
-export const { openCreateModal, openEditModal, openDeleteModal, closeModal } =
+export const { openCreateModal, openEditModal, openDeleteModal, closeModal, clearModalData } =
   clientModalSlice.actions;
 
-export const selectClientModal = (state: RootState) => state.clientModal;
+export const selectClientModal = (state: CrmRootState) => state.clientModal;
 
 export default clientModalSlice.reducer;
