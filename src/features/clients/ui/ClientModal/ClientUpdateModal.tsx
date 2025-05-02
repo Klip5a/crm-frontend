@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { FormProvider } from "react-hook-form";
 
@@ -6,8 +5,6 @@ import { Client } from "@entities/client";
 import { ClientFormValues } from "@entities/client/schema";
 import { useClientForm } from "@features/clients/hooks/useClientForm";
 import { useClients } from "@features/clients/hooks/useClients";
-// import { useClients } from "@features/clients/hooks/useClients";
-// import { useClientModal } from "@features/clients/hooks/useModal";
 import { useOpenModal } from "@features/clients/hooks/useOpenModal";
 import { useNotification } from "@shared/hooks/useNotification";
 import Modal from "@shared/ui/Modal";
@@ -18,8 +15,6 @@ import FloatingLabelInput from "./components/FloatingLabelInput";
 import ModalBody from "./ModalBody";
 import ModalFooter from "./ModalFooter";
 import ModalHeader from "./ModalHeader";
-
-// import { useModalForm } from "../../hooks/useModalForm";
 
 interface ModalProps {
   selectedClient: Client | null;
@@ -41,6 +36,8 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
     remove,
     handleSubmit,
     reset,
+    validationAttempt,
+    setValidationAttempt,
   } = formMethods;
 
   useEffect(() => {
@@ -58,17 +55,42 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
     }
   }, [reset, selectedClient]);
 
-  const formValues = formMethods.watch();
+  // useEffect(() => {
+  //   const contacts = formMethods.getValues("contacts") ?? [];
+  //   console.log("contacts:", contacts);
+  //   console.log("fields.length", fields.length);
+  //   console.log("contacts.length", contacts?.length ?? 0);
 
-  useEffect(() => {
-    console.log("FORM VALUES UPDATED:", formValues);
-  }, [formValues]);
+  //   console.log(
+  //     "fields ids",
+  //     fields.map((f) => f.id)
+  //   );
+  //   console.log(
+  //     "contacts ids",
+  //     contacts.map((f) => f && f.id)
+  //   );
+  //   console.log("contacts", contacts);
+  // }, [fields]);
+
+  // useEffect(() => {
+  //   const contacts = formMethods.getValues("contacts");
+  //   if (contacts.length !== fields.length) {
+  //     // Синхронизируем массив: оставляем только те элементы, которые есть в fields
+  //     formMethods.setValue(
+  //       "contacts",
+  //       fields.map((f) => ({
+  //         id: f.id,
+  //         type: f.type,
+  //         value: f.value,
+  //       })),
+  //       { shouldValidate: false }
+  //     );
+  //   }
+  // }, [fields, formMethods]);
 
   if (!isOpen || !selectedClient) return null;
 
   const onSave = async (data: ClientFormValues) => {
-    console.log("SUBMIT DATA:", JSON.stringify(data, null, 2));
-
     try {
       await updateClient({
         id: selectedClient.id,
@@ -82,123 +104,91 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
       close();
     } catch (error) {
       addNotification("error", "Ошибка при сохранении клиента", 5000);
+      setValidationAttempt((prev) => prev + 1);
     }
   };
 
+  // const wrappedHandleSubmit = () => {
+  //   console.log("handleSubmit вызван!");
+  //   console.log("Текущее состояние формы:", formMethods.getValues());
+  //   console.log("fields:", fields); // ← fields из useFieldArray
+  //   console.log("Текущие ошибки:", errors);
+  //   return handleSubmit(onSave)();
+  // };
+
   const contactsNodes = fields.map((field, idx) => (
-    <motion.div
+    // <div>
+    <ContactForm
       key={field.id}
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      style={{ position: "relative", zIndex: 10 - idx }}
-    >
-      <ContactForm
-        // key={field.id}
-        index={idx}
-        errorMessage={errors.contacts?.[idx]?.value?.message}
-        remove={remove}
-        // validationAttempt={validationAttempt}
-      />
-    </motion.div>
+      index={idx}
+      field={field}
+      errorMessage={errors.contacts?.[idx]?.value?.message}
+      remove={remove}
+      validationAttempt={validationAttempt}
+    />
+    // </div>
   ));
 
   return (
     <Modal isOpen={isOpen}>
-      <FormProvider {...formMethods}>
-        <ModalHeader
-          // isDelete={isDelete}
-          // isEditing={isEditing}
-          // selectedClient={selectedClient}
-          title={
-            <>
-              Изменить данные
-              <span className="ml-2 text-xs text-txt-grey font-normal">
-                ID: {selectedClient?.id}
-              </span>
-            </>
-          }
-          onClose={close}
-        />
-        <ModalBody
-          // isEditing={isEditing}
-          // contacts={contacts}
-          // name={name}
-          // lastName={lastName}
-          // surname={surname}
-          inputs={
-            <>
-              <FloatingLabelInput
-                label="Фамилия"
-                isEditing={isEditing}
-                {...register("lastName")}
-                error={errors.lastName?.message}
-                // id="last_name"
-                // value={formData.lastName}
-                // onValueChange={(val) => {
-                //   updateFields("lastName", val);
-                // }}
-                // error={errorsValidate.lastName}
-                // validationAttempt={validationAttempt}
-              />
-              <FloatingLabelInput
-                label="Имя"
-                isEditing={isEditing}
-                {...register("name")}
-                error={errors.name?.message}
-                // id="first_name"
-                // value={formData.name}
-                // onValueChange={(val) => {
-                //   updateFields("name", val);
-                // }}
-                // error={errorsValidate.name}
-              />
-              <FloatingLabelInput
-                label="Отчество"
-                isEditing={isEditing}
-                {...register("surname")}
-                // id="middle_name"
-                // value={formData.surname}
-                // onValueChange={(val) => {
-                //   updateFields("surname", val);
-                // }}
-                error={errors.surname?.message}
-              />
-            </>
-          }
-          contacts={contactsNodes}
-          hasContacts={fields.length > 0}
-          addContact={
-            <AddContactButton onClick={handleAddContact} hasContacts={fields.length > 0} />
-          }
-          error={
-            Array.isArray(errors.contacts)
-              ? errors.contacts
-                  .map((e) => (e?.value ? e.value.message : ""))
-                  .filter(Boolean)
-                  .join("\n")
-              : ""
-          }
-          // errorsValidate={errorsValidate}
-          // validationAttempt={validationAttempt}
-          // onNameChange={setName}
-          // onLastNameChange={setLastName}
-          // onSurnameChange={setSurname}
-          // onContactTypeChange={handleContactTypeChange}
-          // onContactValueChange={handleContactValueChange}
-          // onAddContact={addContactForm}
-          // onContactDelete={handleDeleteContact}
-        />
+      <ModalHeader
+        // isDelete={isDelete}
+        // isEditing={isEditing}
+        // selectedClient={selectedClient}
+        title={
+          <>
+            Изменить данные
+            <span className="ml-2 text-xs text-txt-grey font-normal">ID: {selectedClient?.id}</span>
+          </>
+        }
+        onClose={close}
+      />
+      <ModalBody
+        inputs={
+          <>
+            <FloatingLabelInput
+              label="Фамилия"
+              isEditing={isEditing}
+              {...register("lastName")}
+              error={errors.lastName?.message}
+              validationAttempt={validationAttempt}
+            />
+            <FloatingLabelInput
+              label="Имя"
+              isEditing={isEditing}
+              {...register("name")}
+              error={errors.name?.message}
+              validationAttempt={validationAttempt}
+            />
+            <FloatingLabelInput
+              label="Отчество"
+              isEditing={isEditing}
+              {...register("surname")}
+              error={errors.surname?.message}
+              validationAttempt={validationAttempt}
+            />
+          </>
+        }
+        contacts={<FormProvider {...formMethods}>{contactsNodes}</FormProvider>}
+        hasContacts={fields.length > 0}
+        addContact={<AddContactButton onClick={handleAddContact} hasContacts={fields.length > 0} />}
+        error={
+          Array.isArray(errors.contacts)
+            ? errors.contacts
+                .map((e) => (e?.value ? e.value.message : ""))
+                .filter(Boolean)
+                .join("\n")
+            : ""
+        }
+      />
 
-        <ModalFooter
-          // isDelete={isDelete}
-          isEditing={isEditing}
-          onSave={handleSubmit(onSave)}
-          // onDelete={handleDelete}
-          onClose={close}
-        />
-      </FormProvider>
+      <ModalFooter
+        // isDelete={isDelete}
+        isEditing={isEditing}
+        onSave={handleSubmit(onSave)}
+        // onDelete={handleDelete}
+        onClose={close}
+      />
     </Modal>
   );
 };
