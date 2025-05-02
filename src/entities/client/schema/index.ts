@@ -24,16 +24,16 @@ export const contactSchema = z
       }
     }
 
-    if (["Телефон", "Доп. телефон"].includes(data.type)) {
-      const phoneDigits = data.value.replace(/\D/g, "");
-      if (!/^7\d{10}$/.test(phoneDigits)) {
-        ctx.addIssue({
-          path: ["value"],
-          code: z.ZodIssueCode.custom,
-          message: "Введите корректный номер телефона",
-        });
-      }
-    }
+    // if (["Телефон", "Доп. телефон"].includes(data.type)) {
+    //   const phoneDigits = data.value.replace(/\D/g, "");
+    //   if (!/^7\d{10}$/.test(phoneDigits)) {
+    //     ctx.addIssue({
+    //       path: ["value"],
+    //       code: z.ZodIssueCode.custom,
+    //       message: "Введите корректный номер телефона",
+    //     });
+    //   }
+    // }
   });
 
 export const clientFormSchema = z.object({
