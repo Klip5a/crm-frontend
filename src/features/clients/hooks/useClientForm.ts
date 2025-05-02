@@ -1,15 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { Client, ClientContact } from "@entities/client";
-import { clientFormSchema } from "@entities/client/schema";
+import { clientFormSchema, ClientFormValues } from "@entities/client/schema";
 
 export interface ClientContactExtended extends ClientContact {
   isNew: boolean;
 }
 
 export function useClientForm(initialClient: Client | null) {
-  const form = useForm({
+  const [validationAttempt, setValidationAttempt] = useState(0);
+  const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: initialClient
       ? {
@@ -28,12 +30,14 @@ export function useClientForm(initialClient: Client | null) {
           surname: "",
           contacts: [],
         },
-    mode: "onSubmit",
+    mode: "onChange",
+    shouldUnregister: true,
   });
 
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "contacts",
+    keyName: "id",
   });
 
   const handleAddContact = () => {
@@ -53,5 +57,7 @@ export function useClientForm(initialClient: Client | null) {
     handleAddContact,
     remove,
     replace,
+    validationAttempt,
+    setValidationAttempt,
   };
 }
