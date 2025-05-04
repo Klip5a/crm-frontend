@@ -6,6 +6,7 @@ import { ClientFormValues } from "@entities/client/schema";
 import { useClientForm } from "@features/clients/hooks/useClientForm";
 import { useClients } from "@features/clients/hooks/useClients";
 import { useOpenModal } from "@features/clients/hooks/useOpenModal";
+import { ModalProps } from "@features/clients/interface/modal";
 import { useNotification } from "@shared/hooks/useNotification";
 import Modal from "@shared/ui/Modal";
 
@@ -15,13 +16,6 @@ import FloatingLabelInput from "./components/FloatingLabelInput";
 import ModalBody from "./ModalBody";
 import ModalFooter from "./ModalFooter";
 import ModalHeader from "./ModalHeader";
-
-interface ModalProps {
-  selectedClient: Client | null;
-  isOpen: boolean;
-  isEditing?: boolean;
-  isDelete?: boolean;
-}
 
 const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEditing }) => {
   const { close } = useOpenModal();
@@ -72,25 +66,24 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
   //   console.log("contacts", contacts);
   // }, [fields]);
 
-  // useEffect(() => {
-  //   const contacts = formMethods.getValues("contacts");
-  //   if (contacts.length !== fields.length) {
-  //     // Синхронизируем массив: оставляем только те элементы, которые есть в fields
-  //     formMethods.setValue(
-  //       "contacts",
-  //       fields.map((f) => ({
-  //         id: f.id,
-  //         type: f.type,
-  //         value: f.value,
-  //       })),
-  //       { shouldValidate: false }
-  //     );
-  //   }
-  // }, [fields, formMethods]);
-
   if (!isOpen || !selectedClient) return null;
 
+  const allErrors = [
+    errors.lastName?.message,
+    errors.name?.message,
+    errors.surname?.message,
+    ...(Array.isArray(errors.contacts)
+      ? errors.contacts.map((e) => e?.value?.message).filter(Boolean)
+      : []),
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   const onSave = async (data: ClientFormValues) => {
+    // console.log("onSave вызван!");
+    // console.log("SUBMIT DATA:", JSON.stringify(data, null, 2));
+    console.log("Текущие ошибки:", JSON.stringify(errors, null, 2));
+    // console.log(data);
     try {
       await updateClient({
         id: selectedClient.id,
@@ -104,16 +97,25 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
       close();
     } catch (error) {
       addNotification("error", "Ошибка при сохранении клиента", 5000);
-      setValidationAttempt((prev) => prev + 1);
     }
   };
 
   // const wrappedHandleSubmit = () => {
   //   console.log("handleSubmit вызван!");
   //   console.log("Текущее состояние формы:", formMethods.getValues());
-  //   console.log("fields:", fields); // ← fields из useFieldArray
+  //   console.log("fields:", fields);
   //   console.log("Текущие ошибки:", errors);
-  //   return handleSubmit(onSave)();
+
+  //   return handleSubmit(
+  //     (data) => {
+  //       console.log("Форма валидна, вызываем onSave");
+  //       onSave(data);
+  //     },
+  //     (errors) => {
+  //       console.log("Ошибки валидации:", errors);
+  //       setValidationAttempt((prev) => prev + 1);
+  //     }
+  //   )();
   // };
 
   const contactsNodes = fields.map((field, idx) => (
@@ -172,20 +174,27 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
         contacts={<FormProvider {...formMethods}>{contactsNodes}</FormProvider>}
         hasContacts={fields.length > 0}
         addContact={<AddContactButton onClick={handleAddContact} hasContacts={fields.length > 0} />}
-        error={
-          Array.isArray(errors.contacts)
-            ? errors.contacts
-                .map((e) => (e?.value ? e.value.message : ""))
-                .filter(Boolean)
-                .join("\n")
-            : ""
-        }
+        // error={
+        //   Array.isArray(errors.contacts)
+        //     ? errors.contacts
+        //         .map((e) => (e?.value ? e.value.message : ""))
+        //         .filter(Boolean)
+        //         .join("\n")
+        //     : ""
+        // }
+        error={allErrors}
       />
 
       <ModalFooter
         // isDelete={isDelete}
         isEditing={isEditing}
-        onSave={handleSubmit(onSave)}
+        textButton="Сохранить"
+        // onSubmit={handleSubmit(onSave)}
+        onSubmit={handleSubmit(
+          onSave, // успешная валидация
+          () => setValidationAttempt((prev) => prev + 1) // ошибки валидации
+        )}
+        // onSave={wrappedHandleSubmit}
         // onDelete={handleDelete}
         onClose={close}
       />
