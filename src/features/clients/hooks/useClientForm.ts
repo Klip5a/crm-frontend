@@ -30,14 +30,15 @@ export function useClientForm(initialClient: Client | null) {
           surname: "",
           contacts: [],
         },
-    mode: "onChange",
-    shouldUnregister: true,
+    mode: "onSubmit",
+    shouldUnregister: false,
   });
 
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "contacts",
-    keyName: "id",
+    keyName: "_id",
+    shouldUnregister: false,
   });
 
   const handleAddContact = () => {
