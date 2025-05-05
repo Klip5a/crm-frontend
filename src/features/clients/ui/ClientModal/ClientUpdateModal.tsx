@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { FormProvider } from "react-hook-form";
 
-import { Client } from "@entities/client";
 import { ClientFormValues } from "@entities/client/schema";
 import { useClientForm } from "@features/clients/hooks/useClientForm";
 import { useClients } from "@features/clients/hooks/useClients";
@@ -13,6 +12,7 @@ import Modal from "@shared/ui/Modal";
 import AddContactButton from "./components/AddContactButton";
 import ContactForm from "./components/ContactForm";
 import FloatingLabelInput from "./components/FloatingLabelInput";
+import { collectErrorMessages } from "./lib/collectErrorsMessages";
 import ModalBody from "./ModalBody";
 import ModalFooter from "./ModalFooter";
 import ModalHeader from "./ModalHeader";
@@ -66,23 +66,12 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
   //   console.log("contacts", contacts);
   // }, [fields]);
 
-  if (!isOpen || !selectedClient) return null;
-
-  const allErrors = [
-    errors.lastName?.message,
-    errors.name?.message,
-    errors.surname?.message,
-    ...(Array.isArray(errors.contacts)
-      ? errors.contacts.map((e) => e?.value?.message).filter(Boolean)
-      : []),
-  ]
-    .filter(Boolean)
-    .join("\n");
-
   const onSave = async (data: ClientFormValues) => {
+    if (!selectedClient) return;
+
     // console.log("onSave вызван!");
     // console.log("SUBMIT DATA:", JSON.stringify(data, null, 2));
-    console.log("Текущие ошибки:", JSON.stringify(errors, null, 2));
+    // console.log("Текущие ошибки:", JSON.stringify(errors, null, 2));
     // console.log(data);
     try {
       await updateClient({
@@ -118,19 +107,6 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
   //   )();
   // };
 
-  const contactsNodes = fields.map((field, idx) => (
-    // <div>
-    <ContactForm
-      key={field.id}
-      index={idx}
-      field={field}
-      errorMessage={errors.contacts?.[idx]?.value?.message}
-      remove={remove}
-      validationAttempt={validationAttempt}
-    />
-    // </div>
-  ));
-
   return (
     <Modal isOpen={isOpen}>
       <ModalHeader
@@ -152,37 +128,42 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
               label="Фамилия"
               isEditing={isEditing}
               {...register("lastName")}
-              error={errors.lastName?.message}
+              error={!!errors.lastName}
               validationAttempt={validationAttempt}
             />
             <FloatingLabelInput
               label="Имя"
               isEditing={isEditing}
               {...register("name")}
-              error={errors.name?.message}
+              error={!!errors.name}
               validationAttempt={validationAttempt}
             />
             <FloatingLabelInput
               label="Отчество"
               isEditing={isEditing}
               {...register("surname")}
-              error={errors.surname?.message}
+              error={!!errors.surname}
               validationAttempt={validationAttempt}
             />
           </>
         }
-        contacts={<FormProvider {...formMethods}>{contactsNodes}</FormProvider>}
+        contacts={
+          <FormProvider {...formMethods}>
+            {fields.map((field, idx) => (
+              <ContactForm
+                key={field.id}
+                index={idx}
+                field={field}
+                errorMessage={errors.contacts?.[idx]?.value?.message}
+                remove={remove}
+                validationAttempt={validationAttempt}
+              />
+            ))}
+          </FormProvider>
+        }
         hasContacts={fields.length > 0}
         addContact={<AddContactButton onClick={handleAddContact} hasContacts={fields.length > 0} />}
-        // error={
-        //   Array.isArray(errors.contacts)
-        //     ? errors.contacts
-        //         .map((e) => (e?.value ? e.value.message : ""))
-        //         .filter(Boolean)
-        //         .join("\n")
-        //     : ""
-        // }
-        error={allErrors}
+        error={collectErrorMessages(errors).join("\n")}
       />
 
       <ModalFooter
@@ -190,10 +171,7 @@ const ClientUpdateModal: React.FC<ModalProps> = ({ selectedClient, isOpen, isEdi
         isEditing={isEditing}
         textButton="Сохранить"
         // onSubmit={handleSubmit(onSave)}
-        onSubmit={handleSubmit(
-          onSave, // успешная валидация
-          () => setValidationAttempt((prev) => prev + 1) // ошибки валидации
-        )}
+        onSubmit={handleSubmit(onSave, () => setValidationAttempt((prev) => prev + 1))}
         // onSave={wrappedHandleSubmit}
         // onDelete={handleDelete}
         onClose={close}
