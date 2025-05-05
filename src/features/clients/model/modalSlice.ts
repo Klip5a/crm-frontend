@@ -11,18 +11,32 @@ export interface ClientModalSlice {
   isOpen: boolean;
   modalType: ModalType;
   selectedClient: Client | null;
+  loadingStates: {
+    editModal: boolean;
+    deleteModal: boolean;
+  };
 }
 
 const initialState: ClientModalSlice = {
   isOpen: false,
   modalType: null,
   selectedClient: null,
+  loadingStates: {
+    editModal: false,
+    deleteModal: false,
+  },
 };
 
 const clientModalSlice = createSlice({
   name: "clientModal",
   initialState,
   reducers: {
+    startLoading: (state, action: PayloadAction<keyof typeof state.loadingStates>) => {
+      state.loadingStates[action.payload] = true;
+    },
+    stopLoading: (state, action: PayloadAction<keyof typeof state.loadingStates>) => {
+      state.loadingStates[action.payload] = false;
+    },
     openCreateModal: (state) => {
       state.isOpen = true;
       state.modalType = "create";
@@ -32,11 +46,13 @@ const clientModalSlice = createSlice({
       state.isOpen = true;
       state.modalType = "edit";
       state.selectedClient = action.payload;
+      state.loadingStates.editModal = false;
     },
     openDeleteModal: (state, action: PayloadAction<Client>) => {
       state.isOpen = true;
       state.modalType = "delete";
       state.selectedClient = action.payload;
+      state.loadingStates.deleteModal = false;
     },
     closeModal: (state) => {
       state.isOpen = false;
@@ -49,8 +65,15 @@ const clientModalSlice = createSlice({
   },
 });
 
-export const { openCreateModal, openEditModal, openDeleteModal, closeModal, clearModalData } =
-  clientModalSlice.actions;
+export const {
+  openCreateModal,
+  openEditModal,
+  openDeleteModal,
+  closeModal,
+  clearModalData,
+  stopLoading,
+  startLoading,
+} = clientModalSlice.actions;
 
 export const selectClientModal = (state: CrmRootState) => state.clientModal;
 
