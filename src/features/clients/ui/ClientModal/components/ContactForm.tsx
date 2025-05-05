@@ -1,151 +1,156 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { InputMask } from "@react-input/mask";
+import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 
-import { ClientContact } from "@entities/client";
-import { useShake } from "@features/clients/hooks/useShake";
+import { useShake } from "@shared/hooks/useShake";
 
 import CustomSelect from "./CustomSelect";
 import { DeleteIcon } from "./DeleteIcon";
 
-import { formatPhoneNumber } from "../lib/phoneFormatter";
-import { useClientContact } from "@features/clients/hooks/useClientContact";
-import { ClientContactExtended } from "@features/clients/hooks/useClientForm";
-
 const CONTACT_TYPES = ["Телефон", "Доп. телефон", "Email", "VK", "Facebook", "Другое"] as const;
-const PHONE_TYPES = ["Телефон", "Доп. телефон"] as const;
+// const PHONE_TYPES = ["Телефон", "Доп. телефон"] as const;
 
 const COMMON_INPUT_CLASSES =
   "block w-full pl-3 text-sm font-semibold bg-[#f4f3f6] border-solid border-x-[1px] border-grey focus:outline-none";
 
-const isPhoneTypeCheck = (type: string) =>
-  PHONE_TYPES.includes(type as (typeof PHONE_TYPES)[number]);
+// const isPhoneType = (type: string) => PHONE_TYPES.includes(type as (typeof PHONE_TYPES)[number]);
+
+// const isPhoneType = (type: string | undefined) => {
+//   console.log("Проверка типа:", type);
+//   console.log("Это телефон?", type && PHONE_TYPES.includes(type as (typeof PHONE_TYPES)[number]));
+//   return type && PHONE_TYPES.includes(type as (typeof PHONE_TYPES)[number]);
+// };
 
 interface ContactFormProps {
+  field: { id: string; type: string; value: string };
   index: number;
-  clientContact: ClientContact;
-  contacts: ClientContactExtended[];
-  isNewContact: boolean;
-  // isEditing: boolean;
   errorMessage?: string;
   validationAttempt: number;
-  // handleChangeType: (index: number, value: string) => void;
-  // handleChangeValue: (index: number, value: string) => void;
-  // handleDelete: (index: number) => void;
+  remove: (idx: number) => void;
 }
 
-const ContactForm: React.FC<ContactFormProps> = memo(
-  ({
-    index,
-    clientContact,
-    contacts,
-    isNewContact,
-    // isEditing,
-    errorMessage,
-    validationAttempt,
-    // handleChangeType,
-    // handleChangeValue,
-    // handleDelete,
-  }) => {
-    const isShaking = useShake(!!errorMessage, validationAttempt);
-    const { handleContactTypeChange, handleContactValueChange, handleDeleteContact } =
-      useClientContact(contacts);
+const ContactForm: React.FC<ContactFormProps> = ({
+  field,
+  index,
+  errorMessage,
+  validationAttempt,
+  remove,
+}) => {
+  const { control, register } = useFormContext();
 
-    const [displayValue, setDisplayValue] = useState("");
+  const [isPhone, setIsPhone] = useState(() => {
+    // Инициализируем состояние на основе начального значения field.type
+    return field.type === "Телефон" || field.type === "Доп. телефон";
+  });
 
-    const inputRef = useRef<HTMLInputElement>(null);
+  const type = useWatch({
+    control,
+    name: `contacts.${index}.type`,
+    defaultValue: field.type,
+  });
 
-    const isPhoneType = useMemo(() => isPhoneTypeCheck(clientContact.type), [clientContact.type]);
+  // Обновляем isPhone при изменении типа
+  useEffect(() => {
+    const phoneCheck = type === "Телефон" || type === "Доп. телефон";
+    // console.log(`Тип изменился на ${type} для индекса ${index}, isPhone: ${phoneCheck}`);
+    setIsPhone(phoneCheck);
+  }, [type, index]);
 
-    useEffect(() => {
-      if (!isNewContact || clientContact.type) return;
+  // const debugContact = {
+  //   index,
+  //   type,
 
-      const hasPhoneContacts = contacts.some((contact) => contact.type === "Телефон");
-      const newType = hasPhoneContacts ? "Доп. телефон" : "Телефон";
+  //   // contact,
+  //   field,
+  //   isPhone,
+  // };
+  // console.log(`contact:${index}`, debugContact);
 
-      if (clientContact.type !== newType) {
-        handleChangeType(index, newType);
-      }
-    }, [isNewContact, clientContact.type, index, contacts, handleChangeType]);
+  const isShaking = useShake(!!errorMessage, validationAttempt);
 
-    useEffect(() => {
-      if (isPhoneType && clientContact.value) {
-        const { formatted } = formatPhoneNumber(clientContact.value, 0);
-        setDisplayValue(formatted);
-      } else {
-        setDisplayValue(clientContact.value);
-      }
-    }, [isPhoneType, clientContact.value]);
+  // useEffect(() => {
+  //   console.log("Contacts после изменения:", field);
+  //   console.log(`Компонент смонтирован с типом: ${type} для индекса ${index}`);
+  //   console.log(isPhone);
+  // }, [field]);
 
-    const containerClassName = useMemo(() => {
-      const baseClass =
-        "flex border-solid border-[1px] transform transition-all duration-300 ease-in-out opacity-100 translate-y-0 relative";
-      const borderClass = errorMessage ? "border-red" : "border-grey";
-      const animationClass = isShaking ? "shake" : "";
-      return `${baseClass} ${borderClass} ${animationClass}`;
-    }, [errorMessage, isShaking]);
+  const containerClassName = useMemo(() => {
+    const baseClass =
+      "flex border-solid border-[1px] transform transition-all duration-300 ease-in-out opacity-100 translate-y-0 relative";
+    const borderClass = errorMessage ? "border-red" : "border-grey";
+    const animationClass = isShaking ? "shake" : "";
+    return `${baseClass} ${borderClass} ${animationClass}`;
+  }, [errorMessage, isShaking]);
 
-    const handleInputChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const caretPosition = e.target.selectionStart || 0;
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      style={{ position: "relative", zIndex: 10 - index }}
+      className="px-6 pt-[15px]"
+    >
+      <div className={containerClassName}>
+        <input type="hidden" {...register(`contacts.${index}.id`)} defaultValue={field.id} />
+        <Controller
+          control={control}
+          name={`contacts.${index}.type`}
+          render={({ field }) => (
+            <CustomSelect
+              value={field.value}
+              options={CONTACT_TYPES}
+              onChange={field.onChange}
+              disabled={false}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name={`contacts.${index}.value`}
+          render={({ field }) => {
+            // console.log(`Рендер поля value для ${index}. isPhone:`, isPhone);
 
-        if (isPhoneType) {
-          const { formatted, newCaretPosition } = formatPhoneNumber(value, caretPosition);
-
-          setDisplayValue(formatted);
-
-          const digitsOnly = formatted.replace(/\D/g, "");
-          handleChangeValue(index, digitsOnly);
-
-          requestAnimationFrame(() => {
-            if (inputRef.current) {
-              inputRef.current.setSelectionRange(newCaretPosition, newCaretPosition);
+            if (isPhone) {
+              return (
+                <InputMask
+                  className={COMMON_INPUT_CLASSES}
+                  mask="+7 (___) ___-__-__"
+                  replacement={{ _: /\d/ }}
+                  value={field.value || ""}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                  }}
+                  placeholder="+7 (123) 456-78-90"
+                />
+              );
             }
-          });
-        } else {
-          setDisplayValue(value);
-          handleChangeValue(index, value);
-        }
-      },
-      [isPhoneType, index, handleChangeValue]
-    );
 
-    const handleTypeChange = useCallback(
-      (selectedType: string) => {
-        setDisplayValue("");
-        handleChangeValue(index, "");
-        handleChangeType(index, selectedType);
-      },
-      [index, handleChangeType, handleChangeValue]
-    );
-
-    return (
-      <div className="px-6 pt-[15px]">
-        <div className={containerClassName}>
-          <CustomSelect
-            value={clientContact.type}
-            options={CONTACT_TYPES}
-            onChange={handleTypeChange}
-            disabled={!isNewContact && !isNewContact}
-          />
-          <input
-            type="text"
-            value={displayValue}
-            onChange={handleInputChange}
-            ref={inputRef}
-            className={COMMON_INPUT_CLASSES}
-            placeholder={isPhoneType ? "+7 (___) ___-__-__" : "Введите данные контакта"}
-          />
-          <button
-            type="button"
-            onClick={() => handleDelete(index)}
-            className="button-deleteContact relative flex justify-center items-center w-[42px] focus:outline-none after:absolute after:border-none after:border-[1px] hover:after:w-[calc(100%+2px)] hover:after:h-[calc(100%+2px)] hover:after:border-solid hover:after:border-red transition-all duration-200"
-          >
-            <DeleteIcon />
-          </button>
-        </div>
+            return (
+              <input
+                {...field}
+                className={COMMON_INPUT_CLASSES}
+                type="text"
+                placeholder={"Введите данные контакта"}
+              />
+            );
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => {
+            // console.log("Удаляем контакт с индексом:", index);
+            // console.log("Контакты до удаления:", field);
+            remove(index);
+          }}
+          className="button-deleteContact relative flex justify-center items-center w-[42px] focus:outline-none after:absolute after:border-none after:border-[1px] hover:after:w-[calc(100%+2px)] hover:after:h-[calc(100%+2px)] hover:after:border-solid hover:after:border-red transition-all duration-200"
+        >
+          <DeleteIcon />
+        </button>
       </div>
-    );
-  }
-);
+    </motion.div>
+  );
+};
 
 export default ContactForm;
