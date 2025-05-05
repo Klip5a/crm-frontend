@@ -50,7 +50,7 @@ export const clientFormSchema = z.object({
   surname: z
     .string()
     .min(1, "Поле 'Отчество' не может быть пустым")
-    .regex(/^[a-zA-Zа-яА-ЯёЁ-]+$/, "Только буквы")
-    .refine((val) => /^\S+$/.test(val), "Не должно содержать пробелов"),
+    .regex(/^[a-zA-Zа-яА-ЯёЁ-]+$/, "Поле 'Отчество' должно содержать только буквы")
+    .refine((val) => /^\S+$/.test(val), "Поле 'Отчество' не должно содержать пробелов"),
   contacts: z.array(contactSchema),
 });

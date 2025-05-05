@@ -25,7 +25,7 @@ const ClientTable: React.FC<ClientTableProps> = ({
   // onSort,
   // fetchClients,
 }) => {
-  const { clients, isLoading } = useClients(searchQuery);
+  const { clients, isLoading } = useClients({ searchQuery });
   // const [sortField, setSortField] = useState<string | null>("id");
   const [sortField, setSortField] = useState<Field | null>("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");

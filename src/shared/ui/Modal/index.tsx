@@ -1,12 +1,12 @@
 import React, { useLayoutEffect, useState } from "react";
 
-export interface ModalProps {
+interface ModalProps {
   isOpen: boolean;
   children: React.ReactNode;
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, children }) => {
-  const [shouldRender, setShouldRender] = useState<boolean>(false);
+  const [shouldRender, setShouldRender] = useState(false);
   const [animate, setAnimate] = useState(false);
   const animationDuration = 500;
 
