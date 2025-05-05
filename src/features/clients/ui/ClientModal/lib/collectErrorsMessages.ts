@@ -12,30 +12,24 @@ export function collectErrorMessages(errors: FieldErrors<ClientFormValues>): str
 
     const error = errors[key as keyof typeof errors];
 
-    console.log(error);
-
     if (Array.isArray(error)) {
       error.forEach((item) => {
         if (item && typeof item === "object") {
           if ("value" in item && item.value?.message) {
             messages.push(item.value.message);
-            console.log(messages);
           } else {
             messages = messages.concat(collectErrorMessages(item));
-            console.log(messages);
           }
         }
       });
     } else if (error && typeof error === "object") {
       if ("message" in error && error.message) {
         messages.push(error.message);
-        console.log(messages);
       } else {
         messages = messages.concat(collectErrorMessages(error as FieldError));
       }
     }
   }
-  console.log(messages);
 
   return messages;
 }
