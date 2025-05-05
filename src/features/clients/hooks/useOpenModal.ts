@@ -2,7 +2,15 @@ import { Client } from "@entities/client";
 
 import { useCrmDispatch } from "./crmRedux";
 
-import { closeModal, openCreateModal, openDeleteModal, openEditModal } from "../model/modalSlice";
+import {
+  closeModal,
+  openCreateModal,
+  openDeleteModal,
+  openEditModal,
+  startLoading,
+} from "../model/modalSlice";
+
+const TIMEOUT = 500;
 
 export function useOpenModal() {
   const dispatch = useCrmDispatch();
@@ -12,10 +20,16 @@ export function useOpenModal() {
       dispatch(openCreateModal());
     },
     editClientModal: (client: Client) => {
-      dispatch(openEditModal(client));
+      dispatch(startLoading("editModal"));
+      setTimeout(() => {
+        dispatch(openEditModal(client));
+      }, TIMEOUT);
     },
     deleteClientModal: (client: Client) => {
-      dispatch(openDeleteModal(client));
+      dispatch(startLoading("deleteModal"));
+      setTimeout(() => {
+        dispatch(openDeleteModal(client));
+      }, TIMEOUT);
     },
     close: () => {
       dispatch(closeModal());
