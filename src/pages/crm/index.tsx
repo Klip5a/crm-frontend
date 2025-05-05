@@ -1,16 +1,21 @@
 // import { useState } from "react";
 
 // import { Client, getClients, searchClients } from "@entities/client";
+import { useModal } from "@features/clients/hooks/useModal";
 import { useOpenModal } from "@features/clients/hooks/useOpenModal";
+import { ClientProvider } from "@features/clients/provider/ClientProvider";
 import AddClientButton from "@features/clients/ui/AddClientButton";
-import ClientModal from "@features/clients/ui/ClientModal";
+import ClientCreateModal from "@features/clients/ui/ClientModal/ClientCreateModal";
+import ClientDeleteModal from "@features/clients/ui/ClientModal/ClientDeleteModal";
+// import ClientModal from "@features/clients/ui/ClientModal";
+import ClientUpdateModal from "@features/clients/ui/ClientModal/ClientUpdateModal";
 import ClientTable from "@features/clients/ui/ClientTable/ClientTable";
 import NotificationContainer from "@shared/ui/Notification";
 
 import Header from "./components/Header";
 import { useSearch } from "./hooks/useSearch";
 
-const CrmPage: React.FC = () => {
+const CrmContent: React.FC = () => {
   // const [isModalOpen, setIsModalOpen] = useState(false);
 
   // const [searchQuery, setSearchQuery] = useState("");
@@ -19,8 +24,6 @@ const CrmPage: React.FC = () => {
   //   setSearchQuery(query);
   // }
 
-  const { search, debounceSearch, onSearchChange } = useSearch("", 300);
-  const { createClient } = useOpenModal();
   // const openModal = () => {
   //   setIsModalOpen(true);
   // };
@@ -40,6 +43,10 @@ const CrmPage: React.FC = () => {
   //   }
   // }, [searchQuery, debouncedFetchClients, fetchClients]);
 
+  const { search, debounceSearch, onSearchChange } = useSearch("", 300);
+  const { isOpen, selectedClient, isEditing, isCreate, isDelete } = useModal();
+  const { createClientModal } = useOpenModal();
+
   return (
     <>
       <Header value={search} onChange={onSearchChange} />
@@ -54,9 +61,9 @@ const CrmPage: React.FC = () => {
           // onSort={handleSort}
           // fetchClients={fetchClients}
         />
-        <AddClientButton onClick={createClient} />
+        <AddClientButton onClick={createClientModal} />
 
-        <ClientModal
+        {/* <ClientModal
         // isOpen={isModalOpen}
         // isEditing={false}
         // isDelete={false}
@@ -64,6 +71,25 @@ const CrmPage: React.FC = () => {
         // onSave={fetchClients}
         // onUpdate={fetchClients}
         // onDelete={fetchClients}
+        /> */}
+        {/* <ClientCreateModal
+          isOpen={modalType === "create" && isOpen}
+          onClose={() => dispatch(closeModal())}
+        /> */}
+
+        <ClientUpdateModal
+          key={selectedClient?.id}
+          isOpen={isOpen && isEditing}
+          selectedClient={selectedClient}
+          isEditing={isEditing}
+        />
+
+        <ClientCreateModal selectedClient={selectedClient} isOpen={isOpen && isCreate} />
+
+        <ClientDeleteModal
+          isOpen={isOpen && isDelete}
+          selectedClient={selectedClient}
+          isDelete={isDelete}
         />
       </div>
 
@@ -72,4 +98,10 @@ const CrmPage: React.FC = () => {
   );
 };
 
-export default CrmPage;
+export default function CrmPage() {
+  return (
+    <ClientProvider>
+      <CrmContent />
+    </ClientProvider>
+  );
+}
