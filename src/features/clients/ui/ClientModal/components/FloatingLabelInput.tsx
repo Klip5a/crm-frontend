@@ -1,42 +1,31 @@
-import { memo, useEffect, useRef } from "react";
+import { forwardRef, memo } from "react";
 
-import { useShake } from "@features/clients/hooks/useShake";
+import { useShake } from "@shared/hooks/useShake";
 
 interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  value: string;
-  onValueChange: (value: string) => void;
   isEditing?: boolean;
-  error?: string;
-  validationAttempt?: number;
+  error: boolean;
+  validationAttempt: number;
 }
 
 const FloatingLabelInput: React.FC<FloatingLabelInputProps> = memo(
-  ({ label, error, isEditing, value, onValueChange, validationAttempt, ...rest }) => {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const isShaking = useShake(!!error, validationAttempt);
+  forwardRef<HTMLInputElement, FloatingLabelInputProps>(
+    ({ label, error, isEditing, validationAttempt, onBlur, ...rest }, ref) => {
+      const isShaking = useShake(!!error, validationAttempt);
+      const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        if (onBlur) onBlur(event);
+      };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      onValueChange(e.target.value);
-    };
-
-    const handleBlur = () => {
-      if (inputRef.current) {
-        onValueChange(inputRef.current.value);
-      }
-    };
-
-    return (
-      <div className={`mb-4 relative ${isShaking ? "shake" : ""}`}>
-        <input
-          ref={inputRef}
-          type="text"
-          {...rest}
-          placeholder=" "
-          value={value}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          className={`
+      return (
+        <div className={`mb-4 relative ${isShaking ? "shake" : ""}`}>
+          <input
+            ref={ref}
+            type="text"
+            {...rest}
+            placeholder=" "
+            onBlur={handleBlur}
+            className={`
             mt-1
             block
             text-sm
@@ -48,10 +37,10 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = memo(
             peer
             ${error ? "border-red" : "border-gray"}
           `}
-        />
-        <label
-          htmlFor={rest.id || ""}
-          className={`
+          />
+          <label
+            htmlFor={rest.id || ""}
+            className={`
             absolute left-0
             transition-all
             duration-300
@@ -66,21 +55,14 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = memo(
             peer-focus:-top-2
             peer-focus:-translate-y-0
             `}
-        >
-          {label}
-          {!isEditing && <span className="text-firm font-bold">*</span>}
-        </label>
-      </div>
-    );
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.value === nextProps.value &&
-      prevProps.error === nextProps.error &&
-      prevProps.isEditing === nextProps.isEditing &&
-      prevProps.validationAttempt === nextProps.validationAttempt
-    );
-  }
+          >
+            {label}
+            {!isEditing && <span className="text-firm font-bold">*</span>}
+          </label>
+        </div>
+      );
+    }
+  )
 );
 
 export default FloatingLabelInput;
