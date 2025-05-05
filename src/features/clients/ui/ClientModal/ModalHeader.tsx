@@ -1,19 +1,14 @@
-import { Client } from "@entities/client";
+// import { Client } from "@entities/client";
 import closeIcon from "@shared/assets/close.svg";
 
 interface ModalHeaderProps {
-  isDelete: boolean;
-  isEditing: boolean;
-  selectedClient: Client | null;
+  isDelete?: boolean;
+  title?: React.ReactNode;
+  subtitle?: React.ReactNode;
   onClose: () => void;
 }
 
-const ModalHeader: React.FC<ModalHeaderProps> = ({
-  isDelete,
-  isEditing,
-  selectedClient,
-  onClose,
-}) => {
+const ModalHeader: React.FC<ModalHeaderProps> = ({ isDelete, title, subtitle, onClose }) => {
   return (
     <>
       {isDelete ? (
@@ -33,18 +28,18 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
       ) : (
         <div className="px-7 pb-2">
           <div className="flex justify-between">
-            <h3 className="text-lg font-bold text-black" id="modal-title">
-              {isEditing ? (
-                <>
-                  Изменить данные
-                  <span className="ml-2 text-xs text-txt-grey font-normal">
+            <h3 className="text-lg font-bold text-black">
+              {title}
+              {/* Изменить данные */}
+              {/* <span className="ml-2 text-xs text-txt-grey font-normal">
                     ID: {selectedClient?.id}
-                  </span>
-                </>
+                  </span> */}
+              {/* </>
               ) : (
                 <>Новый клиент</>
-              )}
+              )} */}
             </h3>
+            {subtitle && <div className="text-center text-sm mt-2">{subtitle}</div>}
             <button
               onClick={onClose}
               type="button"
